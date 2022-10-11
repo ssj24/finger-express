@@ -3,6 +3,6 @@ module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
   ],
-  publicPath: '/finger-express',
+  publicPath: '/finger-express/',
   outputDir: 'docs'
 })
