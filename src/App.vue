@@ -1,28 +1,87 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app class="appContainer">
+    <v-app-bar
+      app
+      color="accent"
+      dark
+    >
+      <v-btn
+        text
+        class="d-flex align-center"
+        id="no-background-hover"
+        @click="reloadPage"
+        :ripple="false"
+      >
+        <v-img
+          alt="Finger Express Logo"
+          class="shrink mr-2"
+          contain
+          src="./assets/thunderBig.png"
+          transition="scale-transition"
+          width="40"
+        />
+
+        <v-app-bar-title
+          class="shrink mt-1 hidden-sm-and-down font-weight"
+          color="primary"
+          contain
+          min-width="150"
+          width="150"
+        > Finger Express </v-app-bar-title>
+      </v-btn>
+
+      <v-spacer></v-spacer>
+
+      <v-btn class="white--text font-weight" plain>로그인</v-btn>
+      <v-btn class="white--text font-weight" plain @click="compChanged(true)">신청하기</v-btn>
+      <v-btn class="white--text font-weight" plain>마이페이지</v-btn>
+    </v-app-bar>
+
+    <v-main class="d-flex justify-center align-center">
+      <Home
+        v-if="!applicationForm"
+        :application-form="applicationForm"
+        @clicked="compChanged"
+      />
+      <Form v-else />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Home from './components/Home';
+import Form from './components/Form';
 
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
+    Home,
+    Form,
+  },
+
+  data: () => ({
+    applicationForm: false,
+  }),
+  methods: {
+    reloadPage() {
+      window.location.reload();
+    },
+    compChanged(val) {
+      this.applicationForm = val;
+    }
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style lang="scss">
+.appContainer {
+  font-family: 'S-CoreDream-3Light',  sans-serif;
+}
+#no-background-hover::before {
+   background-color: transparent !important;
+}
+.font-weight {
+  font-weight: 900;
 }
 </style>
