@@ -32,18 +32,18 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn class="white--text font-weight" plain>로그인</v-btn>
       <v-btn class="white--text font-weight" plain @click="compChanged(true)">신청하기</v-btn>
-      <v-btn class="white--text font-weight" plain>마이페이지</v-btn>
+      <v-btn class="white--text font-weight" plain @click="viewHistory(true)">마이페이지</v-btn>
     </v-app-bar>
 
     <v-main class="d-flex justify-center align-center">
       <Home
-        v-if="!applicationForm"
+        v-if="!applicationForm && !checkHistory"
         :application-form="applicationForm"
         @clicked="compChanged"
       />
-      <Form v-else />
+      <Form v-else-if="applicationForm && !checkHistory" />
+      <History v-else-if="checkHistory" />
     </v-main>
   </v-app>
 </template>
@@ -51,6 +51,7 @@
 <script>
 import Home from './components/Home';
 import Form from './components/Form';
+import History from './components/History';
 
 export default {
   name: 'App',
@@ -58,10 +59,12 @@ export default {
   components: {
     Home,
     Form,
+    History,
   },
 
   data: () => ({
     applicationForm: false,
+    checkHistory: false,
   }),
   methods: {
     reloadPage() {
@@ -69,6 +72,10 @@ export default {
     },
     compChanged(val) {
       this.applicationForm = val;
+      if (val) this.checkHistory = false;
+    },
+    viewHistory(val) {
+      this.checkHistory = val;
     }
   }
 };

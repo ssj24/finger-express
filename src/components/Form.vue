@@ -67,7 +67,7 @@
 			></v-select>
 			<!-- 파일 업로드 -->
 			<v-row class="pa-0">
-				<v-col cols="9" md="10"
+				<v-col cols="8" md="10"
 				>
 				<v-file-input
 					v-model="file"
@@ -83,7 +83,7 @@
 				>
 				</v-file-input>
 				</v-col>
-				<v-col cols="3" md="2" class="d-flex justify-center align-center mb-4">
+				<v-col cols="4" md="2" class="d-flex justify-center align-center mb-4">
 					<v-btn
 						width="100%"
 						color="accent"
@@ -109,15 +109,18 @@
 							</v-icon>파일을 드래그해서 추가해주세요
 						</span>
 						<span v-else>
-						<v-chip
-							color="accent"
-							class="col-11 chip-overflow"
-							style="line-height: 100%;"
-							label
-						>
-							{{ file.name }}
-						</v-chip>
-						<p>{{file.sizeInMB}}MB</p>
+							<div>{{file.sizeInMB}}MB</div>
+							<p class="text-h6 text--primary">
+								{{ file.name }}
+							</p>
+							<!-- <v-chip
+								color="accent"
+								class="col-11 chip-overflow"
+								style="line-height: 100%;"
+								label
+							>
+								{{ file.name }}
+							</v-chip> -->
 						</span>
 					</v-card>
 				</v-col>
@@ -458,12 +461,6 @@ export default {
 			uploadHandler(e) {
 				this.file = e;
 				this.showFile();
-				// let file = {
-				// 	name: '뱃살 빨리 빠지게 만드는 운동 2 weeks challenge.mp4', 
-				// 	lastModified: 1609675231000, 
-				// 	webkitRelativePath: '', 
-				// 	size: 44927661
-				// }
 				// this.previewAudio();
 			},
 			// previewAudio(){
@@ -542,13 +539,13 @@ export default {
 	max-width: 95%;
 	padding: 2px 5px;
 }
-::v-deep .v-chip__content {
+:v-deep(.v-chip__content) {
 	display: inline-block !important;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-::v-deep .v-chip__close {
+:v-deep(.v-chip__close) {
 position: absolute;
 top: 5px;
 right: 0;
