@@ -1,5 +1,7 @@
 <template>
-  <div>History</div>
+	<div class="d-flex flex-column align-center justify-center">
+		History
+	</div>
 </template>
 
 <script>

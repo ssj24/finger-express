@@ -109,8 +109,8 @@
 							</v-icon>파일을 드래그해서 추가해주세요
 						</span>
 						<span v-else>
-							<div>{{file.sizeInMB}}MB</div>
-							<p class="text-h6 text--primary">
+							<div class="text-subtitle-2">{{file.sizeInMB}}MB</div>
+							<p class="text-subtitle-1 text--primary">
 								{{ file.name }}
 							</p>
 							<!-- <v-chip

@@ -53,9 +53,3 @@
     }
   }
 </script>
-
-<style lang="scss" scoped>
-  .landing-container {
-    height: calc(100vh - 64px);
-  }
-</style>

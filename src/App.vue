@@ -45,6 +45,25 @@
       <Form v-else-if="applicationForm && !checkHistory" />
       <History v-else-if="checkHistory" />
     </v-main>
+    <v-footer
+      dark
+      padless
+    >
+      <v-card
+        flat
+        tile
+        color="secondary"
+        class="black--text text-center"
+        style="width: 100%;"
+      >
+        <v-card-text class="black--text">
+          COPYRIGHT © TEBAH SOFT. 2021. ALL RIGHTS RESERVED. <br />
+          사업자등록번호: 440-87-02207, 상호명:테바소프트(주), 대표자명:오정섭, 사업장주소:대전 유성구 대덕대로512번길 20 <br />
+          통신판매신고: 제2022-대전유성-0475호 E-mail: tebahsoft@gmail.com 고객센터: 070-7565-8698 개인정보책임: 오정섭(070-7565-8698) <br />
+          [개인정보보호규정] [이용약관]
+        </v-card-text>
+      </v-card>
+    </v-footer>
   </v-app>
 </template>
 
