@@ -127,8 +127,13 @@
 			</v-row>
 			<!-- 녹취록 -->
 			<v-row v-if="preview">
+				<v-card color="grey lighten-4" elevation="6" class="mx-auto mt-5" style="width: 800px; margin-bottom: 1px;">
+					<v-card-text class="text-subtitle-1">
+						원하시는 구간을 설정해주세요
+					</v-card-text>
+				</v-card>
 				<v-card
-					class="mx-auto my-5 previewContainer"
+					class="mx-auto mt-0 mb-5 previewContainer"
 					max-width="800"
 					max-height="500"
 				>
@@ -136,12 +141,6 @@
 						<h2 class="text--primary font-class my-8">
 							녹취록 미리보기
 						</h2>
-						<v-row>
-							<v-col class="d-flex justify-end">
-								<v-btn :class="{primary : selectWhole}" @click="selectWhole = true">전체 선택하기</v-btn>
-								<v-btn :class="{primary : !selectWhole}" @click="selectWhole = false">구간 선택하기</v-btn>
-							</v-col>
-						</v-row>
 						<div class="text--primary" id="previewCheckboxes" v-for="(text, i) in previewText" :key="i" max-height="600px">
 							<input
 								type="checkbox"
@@ -150,12 +149,10 @@
 								class="previewCheckbox"
 								:id="'previewCheck-'+i"
 								@change="checkboxClicked"
-								disabled
 							/>
 							<label :for="'previewCheck-'+i" class="previewLabel">
-								<span v-if="selectWhole && i==0"></span>
-								<v-card v-else-if="!selectWhole && i==0" class="disabledLabel mt-5">
-									<v-card-subtitle>원하시는 구간을 클릭해주세요</v-card-subtitle>
+								<v-card v-if="i==0" class="disabledLabel mt-5">
+									<v-card-subtitle>전체 선택하기</v-card-subtitle>
 								</v-card>
 								<v-card v-else class="px-5 previewLabelCard my-5" shaped>
 										<v-card-subtitle>
@@ -373,28 +370,13 @@ export default {
 				fileRules: [
 					v => !!v || '파일을 등록해주세요'
 				],
-				preview: false,
-				selectWhole: true,
+				preview: true,
 				selected: [],
 				previewText,
 				checkbox: false,
 			}
     },
 		watch: {
-      selectWhole(newVal) {
-				const checkboxes = document.querySelectorAll('.previewCheckbox');
-				const labels = document.querySelector('.previewContainer').querySelectorAll('label');
-				if (newVal) {
-					for (let i=1; i<labels.length; i++) {
-						labels[i].children[0].classList.remove("blue-grey");
-						labels[i].children[0].classList.remove("lighten-4");
-					}
-					this.selected = [];
-				}
-				for (const box of checkboxes) {
-					box.disabled = newVal;
-				}
-      },
 			selected(newVal) {
 				console.log(newVal);
 			}

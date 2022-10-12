@@ -46,23 +46,43 @@
       <History v-else-if="checkHistory" />
     </v-main>
     <v-footer
-      dark
       padless
+      color="white"
     >
-      <v-card
-        flat
-        tile
-        color="secondary"
-        class="black--text text-center"
-        style="width: 100%;"
-      >
-        <v-card-text class="black--text">
-          COPYRIGHT © TEBAH SOFT. 2021. ALL RIGHTS RESERVED. <br />
-          사업자등록번호: 440-87-02207, 상호명:테바소프트(주), 대표자명:오정섭, 사업장주소:대전 유성구 대덕대로512번길 20 <br />
-          통신판매신고: 제2022-대전유성-0475호 E-mail: tebahsoft@gmail.com 고객센터: 070-7565-8698 개인정보책임: 오정섭(070-7565-8698) <br />
-          [개인정보보호규정] [이용약관]
-        </v-card-text>
-      </v-card>
+      <v-row class="d-flex justify-center" style="border-top: 1px solid #E5E5E5;">
+        <v-col cols="11" md="8" class="pa-0">
+          <v-card
+            flat
+            tile
+            style="width: 100%; "
+          >
+            <v-card-text class="grey--text text-caption">
+              <v-row class="ma-0 footer-row">
+                <p>사업자등록번호: 440-87-02207</p>
+                <p>상호명: 테바소프트(주)</p>
+                <p>대표자명: 오정섭</p>
+                <p>사업장주소: 대전 유성구 대덕대로512번길 20</p>
+                <p>통신판매신고: 제2022-대전유성-0475호</p>
+                <p>이메일: tebahsoft@gmail.com</p>
+                <p>고객센터: 070-7565-8698</p>
+                <p>개인정보책임: 오정섭(070-7565-8698)</p>
+              </v-row>
+              <v-row class="ma-0 pa-0 footer-row align-center" style="font-size: 10px;">
+                <p>COPYRIGHT © TEBAH SOFT. 2021. ALL RIGHTS RESERVED.</p>
+                <v-col class="d-flex justify-end">
+                  <v-btn @click="readFile(true)" plain class="pa-0">
+                    개인정보보호규정
+                  </v-btn>
+                  <v-btn @click="readFile(false)" plain class="pa-0">
+                    이용약관
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+
+        </v-col>
+      </v-row>
     </v-footer>
   </v-app>
 </template>
@@ -95,6 +115,13 @@ export default {
     },
     viewHistory(val) {
       this.checkHistory = val;
+    },
+    readFile(bool) {
+      if (bool) {
+        window.open('/finger-express/private_guard.pdf', '_blank')
+      } else {
+        window.open('/finger-express/usage_rule.pdf', '_blank')
+      }
     }
   }
 };
@@ -109,5 +136,19 @@ export default {
 }
 .font-weight {
   font-weight: 900;
+}
+.footer-row > div {
+  padding: 0;
+}
+.footer-row > p {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 0;
+}
+@media only screen and (max-width: 767px) {
+  .footer-row > p {
+    width: 90%;
+    display: block;
+  }
 }
 </style>
