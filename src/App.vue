@@ -22,7 +22,7 @@
         />
 
         <v-app-bar-title
-          class="shrink mt-1 hidden-sm-and-down font-weight"
+          class="mt-1 hidden-sm-and-down font-weight"
           color="primary"
           contain
           min-width="150"

@@ -1,20 +1,24 @@
 <template>
-<div>
-	<section>
-		<h1>서비스 소개</h1>
-		<p>녹음된 파일에서 텍스트를 정확하게 만들어 드립니다.</p>
-		<v-row class="mx-auto" style="width: 80%;">
-			<v-col cols="12" md="6" v-for="(service, i) in services" :key="i">
+<div style="width: 100%;">
+	<section class="my-10">
+		<v-row class="mx-auto mt-10">
+			<v-col cols="12" class="mb-5 text-lg-center subtitle-col">
+				<h1>Finger express는...</h1>
+				<p class="text-subtitle-1 mb-0">녹음된 파일을 정확한 텍스트로 만들어 드립니다</p>
+			</v-col>
+			<v-col class="mx-auto" cols="12" md="6" v-for="(service, i) in services" :key="i">
 				<v-card
-					class="mx-auto"
-					max-width="344"
+					:class="{'ml-auto': i==0 || i==2}"
+					class="pa-3"
+					height="348px"
+					max-width="445px"
 				>
 					<v-img
 						:src=service.img
 						height="200px"
 						contain
 					></v-img>
-					<v-card-title>
+					<v-card-title style="margin-top: 5px; border-top: 1px solid grey;">
 						{{service.title}}
 					</v-card-title>
 					<v-card-subtitle>
@@ -24,10 +28,12 @@
 			</v-col>
 		</v-row>
 	</section>
-	<section>
-		<h1>업무 프로세스</h1>
-		<p>작업은 다음의 순서로 진행됩니다.</p>
-		<v-row>
+	<section class="my-16">
+		<v-row class="mx-auto">
+			<v-col cols="12" class="mb-5 text-lg-center subtitle-col">
+				<h1>Finger express의 프로세스</h1>
+				<p class="text-subtitle-1 mb-0">작업은 다음의 순서로 진행됩니다</p>
+			</v-col>
 			<v-col v-for="(process, i) in processes" :key="i">
 				<v-card
 					class="mx-auto"
@@ -38,7 +44,7 @@
 						:src=process.img
 						height="200px"
 					></v-img>
-					<v-card-title>
+					<v-card-title class="process-title">
 						{{process.title}}
 					</v-card-title>
 				</v-card>
@@ -46,7 +52,6 @@
 		</v-row>
 	</section>
 </div>
-	
 </template>
 
 <script>
@@ -124,4 +129,10 @@ export default {
 
 <style lang="scss" scoped>
 
+.v-card__title.process-title {
+	margin-top: 10px;
+	color: white;
+	background-color: #ff6f00;
+	justify-content: center;
+}
 </style>

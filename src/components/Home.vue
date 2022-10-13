@@ -1,33 +1,39 @@
 <template>
   <v-container class="d-flex flex-column align-center pt-15">
-    <v-row class="text-center" style="background-color: #eee;">
-      <v-col cols="12" class="d-flex justify-center">
+    <v-row class="mb-4 main-row">
+      <v-col cols="12" md="7" class="text-center text-md-start">
+        <h2 class="subheading font-weight-regular mb-5">
+          원하는 부분만 콕~ 골라서 <br/>
+          빨리 완성하는 <br/>
+          온라인 속기 서비스 <br/>
+          finger.exp
+        </h2>
+        <p>
+          <span class="text-dot">녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
+          <br />
+          쉽고 빠르게~
+          <br />
+          4중 보안장치에
+          <br />국가공인 1급 속기사의 정확도를
+          <br />
+          온라인 최저가격으로 제공합니다.
+        </p>
+        
+      </v-col>
+      <v-col cols="12" md="5" class="d-flex flex-column justify-center align-center">
         <v-img
           src="../assets/thunderBig.png"
-          class="shrink my-3"
+          class="shrink"
           contain
           width="200px"
           height="200px"
         />
       </v-col>
-
-      <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3 text-uppercase">
-          Finger Express
-        </h1>
-
-        <h2 class="subheading font-weight-regular">
-          원하는 부분만 콕~ 골라서 빨리 완성하는 <br/>
-          온라인 속기 서비스 finger.exp
-        </h2>
-        <p>
-          녹취록, 의사록, 인터뷰, 회의록, 녹취공증까지 쉽고 빠르게~
-        </p>
-        <p>
-          4중보안장치에, 국가공인 1급속기사의 정확도로 온라인 최저가격으로 제공합니다.
-        </p>
-      </v-col>
-
+    </v-row>
+    <h1 class="display-2 font-weight-bold mb-7 py-5 text-center text-uppercase title-banner">
+      Finger Express
+    </h1>
+    <v-row>
       <v-col
         class="mb-5"
         cols="12"
@@ -40,28 +46,31 @@
         >신청하기</v-btn>
       </v-col>
     </v-row>
-    <v-row>
-      <Process />
-    </v-row>
-    <v-row>
-      <Review />
-    </v-row>
+    <!-- components -->
+    <Process />
+    <Review />
+
+    <!-- banners -->
     <section class="my-5">
-      <h1>고객사 배너</h1>
-      <v-row>
-        <v-col v-for="(firm, i) in firms" :key="i">
+      <v-row class="mx-auto mt-10">
+        <v-col cols="12" class="mb-5 text-lg-center subtitle-col">
+          <h1>고객사</h1>
+        </v-col>
+        <v-col cols="12" md="6" lg="3" v-for="(firm, i) in firms" :key="i">
           <v-card
-            class="mx-auto"
-            max-width="150"
+            class="mx-auto pt-3"
+            max-width="334"
           >
             <v-img
+              class="mx-auto"
               contain
               :src=firm.img
               height="100px"
+              max-width="200px"
             ></v-img>
-            <v-card-title>
+            <v-card-subtitle class="text-center">
               {{firm.title}}
-            </v-card-title>
+            </v-card-subtitle>
           </v-card>
         </v-col>
       </v-row>
@@ -90,11 +99,11 @@ export default {
       },
       {
         img: require("../assets/logos/tae.png"),
-        title: "대한태건도협회",
+        title: "대한태권도협회",
       },
       {
         img: require("../assets/logos/korail.jpg"),
-        title: "코레일",
+        title: "한국철도공사",
       },
       {
         img: require("../assets/logos/gas-gonsa.png"),
@@ -106,7 +115,7 @@ export default {
       },
       {
         img: require("../assets/logos/lg.jpg"),
-        title: "lg",
+        title: "LG",
       },
       {
         img: require("../assets/logos/samsung.jpg"),
@@ -114,7 +123,7 @@ export default {
       },
       {
         img: require("../assets/logos/KT.jpg"),
-        title: "kt",
+        title: "KT",
       },
       {
         img: require("../assets/logos/hanbat.jpg"),
@@ -165,3 +174,28 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.main-row {
+  min-width: 60%;
+}
+.text-dot {
+  text-emphasis: dot;
+  text-emphasis-position: over;
+}
+.title-banner {
+  // background-color: bisque;
+  width: 100%;
+  font-size:6rem !important;
+  line-height: 5.125rem;
+}
+.subtitle-col {
+	border-top: 3px double #ff6f00;
+	border-bottom: 3px double #ff6f00;
+}
+@media only screen and (max-width: 767px) {
+  .title-banner {
+    font-size: 3rem !important;
+    line-height: 3.125rem;
+  }
+}
+</style>

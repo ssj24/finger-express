@@ -17,6 +17,14 @@
 			></v-text-field>
 
 			<v-text-field
+				v-model="password"
+				:counter="10"
+				:rules="passwordRules"
+				label="비밀번호"
+				required
+			></v-text-field>
+
+			<v-text-field
 				v-model="email"
 				:rules="emailRules"
 				label="이메일"
@@ -353,6 +361,10 @@ export default {
 					v => !!v || '이름을 입력해주세요',
 					v => (v && v.length <= 10) || '10자 이내로 입력해주세요',
 				],
+				password: '',
+				passwordRules: [
+					v => !!v || '비밀번호를 입력해주세요',
+				],
 				email: '',
 				emailRules: [
 					v => !!v || '이메일을 입력해주세요',
@@ -370,7 +382,7 @@ export default {
 				fileRules: [
 					v => !!v || '파일을 등록해주세요'
 				],
-				preview: true,
+				preview: false,
 				selected: [],
 				previewText,
 				checkbox: false,
