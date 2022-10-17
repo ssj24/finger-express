@@ -1,5 +1,5 @@
 <template>
-	<div class="d-flex flex-column align-center justify-center my-12" style="width: 100%;">
+	<div v-if = isLogIn class="d-flex flex-column align-center justify-center my-12" style="width: 100%;">
 		<v-row class="main-row" >
 			<v-col cols="12" md="7">
 				<h1 class="text-h3 text-start">{{userName}}<span class="text-h4">님 주문 내역</span></h1>
@@ -44,11 +44,19 @@
 				</v-card>
 			</v-col>
 	</div>
+	<Login v-else :isLogin="isLogin" @loggedIn="updateparent"></Login>
 </template>
 
 <script>
+import Login from './Login.vue';
 export default {
     name: 'checkHistory',
+		props: {
+			isLogin: Boolean,
+		},
+		components: {
+			Login
+		},
 		data: () => ({
 			userName: 'tebah',
 			histories: [
@@ -136,6 +144,11 @@ export default {
 				},
 			]
 		}),
+	methods: {
+		updateparent(val) {
+			this.$emit('loggedIn', val);
+		}
+	}
 }
 </script>
 
