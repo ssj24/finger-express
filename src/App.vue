@@ -14,7 +14,7 @@
       >
         <v-img
           alt="Finger Express Logo"
-          class="shrink mr-2"
+          class="shrink mr-2 py-3"
           contain
           src="./assets/thunderBig.png"
           transition="scale-transition"
@@ -25,8 +25,7 @@
           class="mt-1 hidden-sm-and-down font-weight"
           color="primary"
           contain
-          min-width="150"
-          width="150"
+          width="230"
         > Finger Express </v-app-bar-title>
       </v-btn>
 

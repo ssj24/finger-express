@@ -3,18 +3,20 @@
     <v-row class="mb-4 main-row">
       <v-col cols="12" md="7" class="text-center text-md-start">
         <h2 class="subheading font-weight-regular mb-5">
-          원하는 부분만 콕~ 골라서 <br/>
-          빨리 완성하는 <br/>
-          온라인 속기 서비스 <br/>
-          finger.exp
+          <!-- 온라인 속기 서비스 <br/>
+          증거제출 <br/>
+          녹취록 작성 <br/> -->
+          온라인 속기 서비스 <br />
+          증거제출 
+          녹취록 작성 <br/>
         </h2>
         <p>
           <span class="text-dot">녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
           <br />
-          쉽고 빠르게~
+          쉽고 빠르게!!!
           <br />
           4중 보안장치에
-          <br />국가공인 1급 속기사의 정확도를
+          <br />다수의 작성 경험과 정확도를 가지고
           <br />
           온라인 최저가격으로 제공합니다.
         </p>
@@ -62,15 +64,19 @@
             max-width="334"
           >
             <v-img
+              v-if=firm.img
               class="mx-auto"
               contain
               :src=firm.img
               height="100px"
               max-width="200px"
             ></v-img>
-            <v-card-subtitle class="text-center">
+            <v-card-subtitle v-if=firm.img class="text-center">
               {{firm.title}}
             </v-card-subtitle>
+            <v-card-title v-else style="height: 154px" class="justify-center">
+              {{firm.title}}
+            </v-card-title>
           </v-card>
         </v-col>
       </v-row>
@@ -164,6 +170,10 @@ export default {
       {
         img: require("../assets/logos/bando.png"),
         title: "반도건설",
+      },
+      {
+        img: null,
+        title: "그 외 다수",
       },
     ]
   }),

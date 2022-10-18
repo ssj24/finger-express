@@ -1,5 +1,5 @@
 <template>
-<div class="d-flex flex-column align-center justify-center">
+<div v-if="!isComplete" class="d-flex flex-column align-center justify-center">
 	<v-col cols="11" md="8" lg="6">
 		<v-form
 			ref="form"
@@ -14,18 +14,6 @@
 				:rules="nameRules"
 				label="이름"
 				required
-			></v-text-field>
-
-			<v-text-field
-				v-model="password"
-				:append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-				:rues="[passwordRules.required, passwordRules.min]"
-				:type="show ? 'text' : 'password'"
-				name="password"
-				label="비밀번호"
-				hint="비밀번호는 최소 8자입니다"
-				counter
-				@click:append="show = !show"
 			></v-text-field>
 
 			<v-text-field
@@ -246,13 +234,15 @@
 		</v-form>
 	</v-col>
 </div>
+<Confirm v-else class="d-flex flex-column align-center justify-center my-12" />
 </template>
 
 <script>
+import Confirm from './Confirm.vue'
 export default {
     name: 'applicationForm',
-    props: {
-      
+    components: {
+      Confirm
     },
 
     data: () => {
@@ -365,13 +355,6 @@ export default {
 					v => !!v || '이름을 입력해주세요',
 					v => (v && v.length <= 10) || '10자 이내로 입력해주세요',
 				],
-				show: false,
-				password: '',
-				passwordRules: {
-          required: value => !!value || 'Required.',
-          min: v => v.length >= 8 || 'Min 8 characters',
-					match: () => (`The password you entered don't match`),
-        },
 				email: '',
 				emailRules: [
 					v => !!v || '이메일을 입력해주세요',
@@ -393,6 +376,7 @@ export default {
 				selected: [],
 				previewText,
 				checkbox: false,
+				isComplete: false,
 			}
     },
 		watch: {
@@ -413,6 +397,7 @@ export default {
 					}
 					console.log(formData);
 				}
+					this.isComplete = true;
       },
       reset () {
         this.$refs.form.reset();

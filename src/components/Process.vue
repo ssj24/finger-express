@@ -15,7 +15,7 @@
 				>
 					<v-img
 						:src=service.img
-						height="200px"
+						height="180px"
 						contain
 					></v-img>
 					<v-card-title style="margin-top: 5px; border-top: 1px solid grey;">
@@ -57,73 +57,73 @@
 <script>
 export default {
 	name: 'HomeProcess',
-		data: () => ({
-			services: [
-				{
-					img: require("../assets/service/choice.png"),
-					title: "원하는 부분만 골라서 작업",
-					desc: "불필요한 부분을 덜어내고, 원하는 부분만을 정확하게 텍스트로 만들어드립니다."
-				},
-				{
-					img: require("../assets/service/shield.png"),
-					title: "완벽한 4중 보안",
-					desc: "가장 높은 수준의 보안을 4중 잠금장치로 제공합니다."
-				},
-				{
-					img: require("../assets/service/certificate.png"),
-					title: "국가공인 속기사 작업",
-					desc: "초안 작업부터 최종본까지, 국가공인 속기사가 작업하여 제공합니다."
-				},
-				{
-					img: require("../assets/service/clova.png"),
-					title: "최고의 한글음성인식 엔진",
-					desc: "네이버 클로바 음성인식을 사용하여, 빠르게 속기록 작업을 진행합니다."
-				},
-			],
-			processes: [
-				{
-					img: require("../assets/process/cloud-computing.png"),
-					title: "파일 업로드",
-				},
-				{
-					img: require("../assets/process/chip.png"),
-					title: "AI 음성인식(lite)",
-				},
-				{
-					img: require("../assets/process/select.png"),
-					title: "작업구간 선택",
-				},
-				{
-					img: require("../assets/process/cashless-payment.png"),
-					title: "온라인 결제",
-				},
-				{
-					img: require("../assets/process/clova_B.png"),
-					title: "AI 음성인식 (CLOVA)",
-				},
-				{
-					img: require("../assets/process/typing.png"),
-					title: "타이핑",
-				},
-				{
-					img: require("../assets/process/clerk-with-tie.png"),
-					title: "고객 검수",
-				},
-				{
-					img: require("../assets/process/revision.png"),
-					title: "최종 수정",
-				},
-				{
-					img: require("../assets/process/diploma.png"),
-					title: "검수 & 공증",
-				},
-			]
-		}),
-		methods: {
-			clicked() {
-				this.$emit('clicked', true);
-			}
+	data: () => ({
+		services: [
+			{
+				img: require("../assets/service/choice.png"),
+				title: "원하는 부분만 골라서 작업",
+				desc: "불필요한 부분을 덜어내고, 원하는 부분만을 정확하게 텍스트로 만들어드립니다."
+			},
+			{
+				img: require("../assets/service/shield.png"),
+				title: "완벽한 4중 보안",
+				desc: "가장 높은 수준의 보안을 4중 잠금장치로 제공합니다."
+			},
+			{
+				img: require("../assets/service/certificate.png"),
+				title: "증거자료 제출가능한 녹취록",
+				desc: "초안 작업부터 최종본까지, 자격증을 가지고 다수의 경험을 통한 베테랑 분들이 작성 후 공증까지 해드리는 서비스를 제공해드립니다."
+			},
+			{
+				img: require("../assets/service/text-to-speech.png"),
+				title: "최고의 한글음성인식 엔진",
+				desc: "다수의 다양한 음성파일 인식 및 AI 분야 전문가들이 만든, 빠르고 저렴한 가격으로 속기록 작업을 진행해 드립니다."
+			},
+		],
+		processes: [
+			{
+				img: require("../assets/process/cloud-computing.png"),
+				title: "파일 업로드",
+			},
+			{
+				img: require("../assets/process/chip.png"),
+				title: "AI 음성인식(lite)",
+			},
+			{
+				img: require("../assets/process/select.png"),
+				title: "작업구간 선택",
+			},
+			{
+				img: require("../assets/process/cashless-payment.png"),
+				title: "온라인 결제",
+			},
+			{
+				img: require("../assets/process/ai.png"),
+				title: "AI 음성인식",
+			},
+			{
+				img: require("../assets/process/typing.png"),
+				title: "타이핑",
+			},
+			{
+				img: require("../assets/process/clerk-with-tie.png"),
+				title: "고객 검수",
+			},
+			{
+				img: require("../assets/process/revision.png"),
+				title: "최종 수정",
+			},
+			{
+				img: require("../assets/process/diploma.png"),
+				title: "검수 & 공증",
+			},
+		]
+	}),
+	methods: {
+		clicked() {
+			this.$emit('clicked', true);
 		}
+	}
 }
 </script>
 
