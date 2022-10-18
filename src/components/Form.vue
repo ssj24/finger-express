@@ -234,15 +234,15 @@
 		</v-form>
 	</v-col>
 </div>
-<Confirm v-else class="d-flex flex-column align-center justify-center my-12" />
+<Payment v-else class="d-flex flex-column align-center justify-center my-12" />
 </template>
 
 <script>
-import Confirm from './Confirm.vue'
+import Payment from './Payment.vue'
 export default {
     name: 'applicationForm',
     components: {
-      Confirm
+      Payment
     },
 
     data: () => {
