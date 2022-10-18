@@ -33,7 +33,8 @@
       <v-spacer></v-spacer>
 
       <v-btn class="white--text font-weight" plain @click="compChanged(true)">신청하기</v-btn>
-      <v-btn class="white--text font-weight" plain @click="viewHistory(true)" :isLogin="isLogin">{{ isLogin ? '주문 내역' : '로그인' }}</v-btn>
+      <v-btn class="white--text font-weight" plain @click="viewHistory(true)">{{ this.$store.state.isLogin ? '주문 내역' : '로그인' }}</v-btn>
+      <v-btn class="white--text font-weight" plain @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
     </v-app-bar>
 
     <v-main class="d-flex justify-center align-center">
@@ -43,7 +44,7 @@
         @clicked="compChanged"
       />
       <Form v-else-if="applicationForm && !checkHistory" />
-      <History v-else-if="checkHistory"  @loggedIn="updateparent"/>
+      <History v-else-if="checkHistory"/>
     </v-main>
     <v-footer
       padless
@@ -104,7 +105,6 @@ export default {
   data: () => ({
     applicationForm: false,
     checkHistory: false,
-    isLogin: false,
   }),
   methods: {
     reloadPage() {
@@ -124,8 +124,9 @@ export default {
         window.open('/finger-express/usage_rule.pdf', '_blank')
       }
     },
-    updateparent(val) {
-      this.isLogin = val
+    logout() {
+      window.location.reload();
+      this.$store.commit('LOGGED_OUT');
     }
   }
 };

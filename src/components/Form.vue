@@ -408,7 +408,7 @@ export default {
 						email: this.email,
 						postcode: this.postcode,
 						address: this.address + this.extraAddress,
-						delivery: this.select==='이메일' ? 'd1' : 'd2',
+						delivery: this.select,
 						file: this.file
 					}
 					console.log(formData);

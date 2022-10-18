@@ -1,8 +1,8 @@
 <template>
-	<div v-if = isLogIn class="d-flex flex-column align-center justify-center my-12" style="width: 100%;">
-		<v-row class="main-row" >
+	<div v-if = this.$store.state.isLogin class="d-flex flex-column align-center justify-center my-12" style="width: 100%;">
+		<v-row class="main-row mb-3" >
 			<v-col cols="12" md="7">
-				<h1 class="text-h3 text-start">{{userName}}<span class="text-h4">님 주문 내역</span></h1>
+				<h1 class="text-h4 text-md-h3 text-start">{{ this.$store.state.name ? this.$store.state.name : username }}<span class="text-h5 text-md-h4">님의 주문 내역</span></h1>
 			</v-col>
 		</v-row>
 			<v-col cols="11" md="8">
@@ -32,10 +32,10 @@
 										:step=j+1
 										class="px-0 text-body-1"
 									>
-										{{steps[j].title}}
 										<v-icon>
 											{{steps[j].icon}}
 										</v-icon>
+										{{steps[j].title}}
 									</v-stepper-step>
 								</span>
 							</v-stepper-header>
@@ -44,16 +44,13 @@
 				</v-card>
 			</v-col>
 	</div>
-	<Login v-else :isLogin="isLogin" @loggedIn="updateparent"></Login>
+	<Login v-else class="d-flex flex-column align-center justify-center my-12"></Login>
 </template>
 
 <script>
 import Login from './Login.vue';
 export default {
     name: 'checkHistory',
-		props: {
-			isLogin: Boolean,
-		},
 		components: {
 			Login
 		},
@@ -74,7 +71,7 @@ export default {
 					name: 'tebah',
 					date: '2022/10/07',
 					file: {
-						fileName: 'testsdjfalkdjflkasdjflkasdjf;laksdjf;laksjdfdsfsdafsdfasdfsdfsfsadfjdskfdsifjkdsfjklsdjfldkjfldfl;aksjdf;lkasdjf;laksdjf;lksajdfkljiewjofa;jlksdjlksdjfoidsjflksjflskdtestsdjfalkdjflkasdjflkasdjf;laksdjf;laksjdfdsfsdafsdfasdfsdfsfsadfjdskfdsifjkdsfjklsdjfldkjfldfl;aksjdf;lkasdjf;laksdjf;lksajdfkljiewjofa;jlksdjlksdjfoidsjflksjflskdtestsdjfalkdjflkasdjflkasdjf;laksdjf;laksjdfdsfsdafsdfasdfsdfsfsadfjdskfdsifjkdsfjklsdjfldkjfldfl;aksjdf;lkasdjf;laksdjf;lksajdfkljiewjofa;jlksdjlksdjfoidsjflksjflskdtestsdjfalkdjflkasdjflkasdjf;laksdjf;laksjdfdsfsdafsdfasdfsdfsfsadfjdskfdsifjkdsfjklsdjfldkjfldfl;aksjdf;lkasdjf;laksdjf;lksajdfkljiewjofa;jlksdjlksdjfoidsjflksjflskdtestsdjfalkdjflkasdjflkasdjf;laksdjf;laksjdfdsfsdafsdfasdfsdfsfsadfjdskfdsifjkdsfjklsdjfldkjfldfl;aksjdf;lkasdjf;laksdjf;lksajdfkljiewjofa;jlksdjlksdjfoidsjflksjflskdtestsdjfalkdjflkasdjflkasdjf;laksdjf;laksjdfdsfsdafsdfasdfsdfsfsadfjdskfdsifjkdsfjklsdjfldkjfldfl;aksjdf;lkasdjf;laksdjf;lksajdfkljiewjofa;jlksdjlksdjfoidsjflksjflskd.mp4',
+						fileName: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum nam molestias id, quaerat sint minima, fugit mollitia doloribus, ut totam libero nisi possimus? Illum eaque quaerat, tempora numquam impedit optio.mp4',
 						fileSize: '14MB'
 					},
 					step: 3,
@@ -144,11 +141,6 @@ export default {
 				},
 			]
 		}),
-	methods: {
-		updateparent(val) {
-			this.$emit('loggedIn', val);
-		}
-	}
 }
 </script>
 
