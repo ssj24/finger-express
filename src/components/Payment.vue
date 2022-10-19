@@ -91,25 +91,25 @@ export default {
           console.log(rsp);
           // "F0004:PG사 결제요청에 실패하여 중단합니다.(imp_542319383034) 8105, 포맷에러(지불|신용카드|금액)"
         }
-      // }, function (rsp) { // callback
-      // if (rsp.success) { // 결제 성공 시: 결제 승인 또는 가상계좌 발급에 성공한 경우
-      //   // axios로 HTTP 요청
-      //   axios({
-      //     url: "http://localhost:8080/", // 예: https://www.myservice.com/payments/complete
-      //     method: "post",
-      //     headers: { "Content-Type": "application/json" },
-      //     data: {
-      //       imp_uid: rsp.imp_uid,
-      //       merchant_uid: rsp.merchant_uid
-      //     }
-      //   }).then((data) => {
-      //     // 서버 결제 API 성공시 로직
-      //     console.log('axios.success');
-      //     console.log(data);
-      //   })
-      // } else {
-      //   alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-      // }
+      }, function (rsp) { // callback
+      if (rsp.success) { // 결제 성공 시: 결제 승인 또는 가상계좌 발급에 성공한 경우
+        // axios로 HTTP 요청
+        axios({
+          url: "http://localhost:8080/", // 예: https://www.myservice.com/payments/complete
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          data: {
+            imp_uid: rsp.imp_uid,
+            merchant_uid: rsp.merchant_uid
+          }
+        }).then((data) => {
+          // 서버 결제 API 성공시 로직
+          console.log('axios.success');
+          console.log(data);
+        })
+      } else {
+        alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+      }
     });
     }
   }
