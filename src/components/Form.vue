@@ -1,5 +1,5 @@
 <template>
-<div v-if="!isComplete" class="d-flex flex-column align-center justify-center">
+<div v-if="!isComplete || !file" class="d-flex flex-column align-center justify-center">
 	<v-col cols="11" md="8" lg="6">
 		<v-form
 			ref="form"
@@ -17,35 +17,60 @@
 			></v-text-field>
 
 			<v-text-field
+				v-model="password"
+				:append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+				:rules="passwordRules"
+				:type="show ? 'text' : 'password'"
+				label="비밀번호"
+				hint="8자 이상 입력해주세요"
+				counter
+				@click:append="show = !show"
+			></v-text-field>
+
+			<v-text-field
+				v-model="phone"
+				:rules="phoneRules"
+				type="tel"
+				label="휴대폰 번호"
+				hint="01x-xxxx-xxxx"
+				required
+			></v-text-field>
+
+			<v-text-field
 				v-model="email"
 				:rules="emailRules"
 				label="이메일"
 				required
 			></v-text-field>
+
+
+			<v-select
+				v-model="select"
+				:items="delivery"
+				:rules="[v => !!v || '하나를 선택해주세요']"
+				label="배송 방식"
+				required
+			></v-select>
 			<!-- 주소 -->
-			<v-row>
+			<v-row v-if="select === '등기'">
 				<v-col cols="9" md="10">
 					<v-row>
 						<v-col cols="4" md="3">
 							<v-text-field
 								v-model="postcode"
 								label="우편번호"
-								required
 							></v-text-field>
 						</v-col>
 						<v-col>
 							<v-text-field
 								v-model="address"
-								:rules="addressRules"
 								label="주소"
-								required
 							></v-text-field>
 						</v-col>
 					</v-row>
 					<v-text-field
 						v-model="extraAddress"
 						label="상세주소"
-						required
 					></v-text-field>
 				</v-col>
 				<v-col cols="3" md="2" class="d-flex justify-center align-center">
@@ -58,13 +83,6 @@
 				</v-col>
 			</v-row>
 
-			<v-select
-				v-model="select"
-				:items="delivery"
-				:rules="[v => !!v || '하나를 선택해주세요']"
-				label="배송 방식"
-				required
-			></v-select>
 			<!-- 파일 업로드 -->
 			<v-row class="pa-0">
 				<v-col cols="8" md="10"
@@ -234,7 +252,7 @@
 		</v-form>
 	</v-col>
 </div>
-<Payment v-else class="d-flex flex-column align-center justify-center my-12" />
+<Payment v-else-if="isComplete && file" :formData="formData" class="d-flex align-center justify-center my-12" />
 </template>
 
 <script>
@@ -355,6 +373,17 @@ export default {
 					v => !!v || '이름을 입력해주세요',
 					v => (v && v.length <= 10) || '10자 이내로 입력해주세요',
 				],
+				show: false,
+				password: '',
+				passwordRules: [
+					v => !!v || '비밀번호를 입력해주세요.',
+					v => (v && v.length > 8) || '8자 이상 입력해주세요',
+				],
+				phone: '',
+				phoneRules: [
+					v => !!v || '휴대폰 번호를 입력해주세요.',
+					v => /01[016789]-[^0][0-9]{2,3}-[0-9]{3,4}/.test(v) || '01x-xxxx-xxxx'
+				],
 				email: '',
 				emailRules: [
 					v => !!v || '이메일을 입력해주세요',
@@ -362,9 +391,6 @@ export default {
 				],
 				postcode,
 				address: postcode ? postcode + ')' + detailAddress : '',
-				addressRules: [
-					v => !!v || '주소를 입력해주세요'
-				],
 				extraAddress: '',
 				select: null,
 				delivery: ['이메일', '등기'],
@@ -377,6 +403,7 @@ export default {
 				previewText,
 				checkbox: false,
 				isComplete: false,
+				formData: {},
 			}
     },
 		watch: {
@@ -387,17 +414,29 @@ export default {
     methods: {
       validate () {
         if (this.$refs.form.validate()) {
-					let formData = {
+					this.formData = {
 						name: this.name,
+						password: this.password,
+						phone: this.phone,
 						email: this.email,
-						postcode: this.postcode,
-						address: this.address + this.extraAddress,
+						postcode: this.postcode || '',
+						address: this.address + this.extraAddress || '',
 						delivery: this.select,
 						file: this.file
 					}
-					console.log(formData);
+					console.log(this.formData);
 				}
-					this.isComplete = true;
+				this.formData = {
+					name: this.name || '',
+					password: this.password || '',
+					phone: this.phone || '',
+					email: this.email || '',
+					postcode: this.postcode || '',
+					address: this.address + this.extraAddress || '',
+					delivery: this.select || '',
+					file: this.file
+				}
+				this.isComplete = true;
       },
       reset () {
         this.$refs.form.reset();
@@ -442,6 +481,14 @@ export default {
 				}).open();
 			},
 			showFile() {
+				window.URL = window.URL || window.webkitURL;
+        let video = document.createElement('video');
+				video.addEventListener('loadedmetadata', () => {
+					window.URL.revokeObjectURL(video.src);
+					this.file.duration = video.duration;
+				});
+        video.preload = 'metadata';
+        video.src = URL.createObjectURL(this.file);
 				this.file.sizeInMB = (this.file.size / (1024*1024)).toFixed(2);
 			},
 			uploadHandler(e) {

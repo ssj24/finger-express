@@ -9,10 +9,9 @@
         <v-row>
           <v-col cols="12">
             <v-text-field
-              v-model="name"
-              :rules="nameRules"
-              :counter="10"
-              label="이름"
+              v-model="email"
+              :rules="emailRules"
+              label="이메일"
               required
             ></v-text-field>
           </v-col>
@@ -69,10 +68,10 @@ export default {
   name: 'LoginComponent',
   data: () => ({
       valid: false,
-      name: '',
-      nameRules: [
-        v => !!v || '이름을 입력해주세요',
-        v => v.length <= 10 || '이름을 정확하게 입력해주세요',
+      email: '',
+      emailRules: [
+        v => !!v || '이메일을 입력해주세요',
+        v => /.+@.+\..+/.test(v) || '유효한 이메일 주소가 아닙니다',
       ],
       show: false,
       password: '',
@@ -84,7 +83,7 @@ export default {
   methods: {
     validate () {
       if (this.$refs.loginForm.validate()) {
-        this.$store.commit('LOGGED_IN', this.name);
+        this.$store.commit('LOGGED_IN', this.email);
       }
     },
     reset () {

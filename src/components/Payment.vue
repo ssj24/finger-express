@@ -1,14 +1,80 @@
 <template>
 <v-row>
-  <v-col cols="11" md="8" lg="5">
-    <v-form lazy-validation class="boxShadowStyle pa-3 pb-5" style="border: 3px solid #ff6f00; border-left: none; border-right: none;border-radius: 5px 5px 0 0;">
+  <v-col cols="11" sm="6" md="4">
+    <v-card class="px-5 py-8">
+      <v-row>
+        <v-card-title class="py-0" style="width: 100%;">
+          <v-col cols="4" class="mr-0 pr-0 text-subtitle-1">
+            기본 요금
+          </v-col>
+
+          <v-col cols="8" class="text-sm-left font-weight-black">{{Intl.NumberFormat('ko-KR').format(basicPrice)}}원 / 5분</v-col>
+        </v-card-title>
+      </v-row>
+      <v-row class="px-4">
+        <v-col cols="4" class="text-subtitle-1">추가 요금</v-col>
+        <v-col cols="8" class="text-subtitle-1 text-sm-left">{{Intl.NumberFormat('ko-KR').format(extraPrice)}}원 / 1분</v-col>
+      </v-row>
+      <v-row class="px-4">
+        <v-col cols="4" class="text-subtitle-1">공증 비용</v-col>
+        <v-col cols="8" class="text-subtitle-1 text-sm-left">{{Intl.NumberFormat('ko-KR').format(billPrice)}}원</v-col>
+      </v-row>
+      <v-row class="px-4">
+        <v-col cols="4" class="text-subtitle-1">등기 비용</v-col>
+        <v-col cols="8" class="text-subtitle-1 text-sm-left">무료</v-col>
+      </v-row>
+    </v-card>
+  </v-col>
+  <v-col cols="11" sm="6" md="4">
+    <v-card class="py-3 px-5">
+      <v-card-title class="pb-0" style="width: 100%;">
+        <p class="text-sm-left font-weight-black text-truncate ">
+          {{formData.file.name}}
+        </p>
+      </v-card-title>
+      <p class="text-subtitle-1 text-sm-left">
+        <v-chip class="mr-3" outlined>
+          파일 길이
+        </v-chip>
+        {{totalDuration}}분
+      </p>
+      <p class="text-subtitle-1 text-sm-left d-flex flex-wrap">
+        <v-chip class="mr-3" outlined>
+          추가 요금
+        </v-chip>
+        {{Intl.NumberFormat('ko-KR').format(extraDuration * extraPrice)}}원
+        <span>
+          ({{extraDuration}}분 * {{Intl.NumberFormat('ko-KR').format(extraPrice)}}원)
+        </span>
+      </p>
+      <p class="text-subtitle-1 text-sm-left">
+        <v-chip class="mr-3" outlined>
+          공증 여부
+        </v-chip>
+        <v-checkbox
+          class="d-inline-block mt-0 pt-0"
+          style="vertical-align: text-top;"
+          v-model="bill"
+          @change="getBill"
+          :label="bill ? '공증을 받겠습니다' : '공증을 받지 않겠습니다'"
+        ></v-checkbox>
+      </p>
+    </v-card>
+  </v-col>
+  <v-col cols="11" md="8">
+    <v-form lazy-validation class="boxShadowStyle pa-3 pb-5" style="border: 3px solid #ff6f00; border-left: none; border-right: none; border-radius: 5px;">
       <v-container>
         <v-row class="text-center">
           <v-col v-if="!isPaid" cols="12">
             <v-card-text>
-              주문금액: {{price}}원
+
+              {{Intl.NumberFormat('ko-KR').format(basicPrice)}}원 + {{Intl.NumberFormat('ko-KR').format(extraDuration * extraPrice)}}원
+              <span v-if="bill">
+                + {{Intl.NumberFormat('ko-KR').format(billPrice)}}원
+              </span>
             </v-card-text>
-            <v-btn color="accent" @click="requestPay">결제하기</v-btn>
+            총 {{Intl.NumberFormat('ko-KR').format(total)}}원
+            <v-btn class="d-block mt-5 mx-auto" color="accent" @click="requestPay">결제하기</v-btn>
           </v-col>
 
           <v-col v-else cols="12">
@@ -31,23 +97,41 @@ import axios from 'axios';
 
 export default {
   name: 'formPayment',
+  props: [
+    'formData',
+  ],
   data: () => ({
-    price: 1000000,
+    totalDuration: 0,
+    basicPrice: 25000,
+    extraPrice: 4000,
+    extraDuration: 0,
+    billPrice: 5000,
+    total: 0,
+    bill: false,
     isPaid: false,
     IMP: window.IMP,
     orderNum: Math.floor(Math.random()* 10000000000),
-
   }),
+  mounted() {
+    console.log(this.formData.file);
+    this.totalDuration = Math.ceil(this.formData.file.duration / 60);
+    this.extraDuration = Math.ceil((this.formData.file.duration - 300) / 60);
+    this.total = this.basicPrice + this.extraDuration * this.extraPrice;
+  },
   methods: {
+    getBill: function() {
+      if (this.bill) this.total += this.billPrice;
+      else this.total -= this.billPrice;
+    },
     requestPay: function () {
       this.IMP.init('imp88827277');
       // IMP.request_pay(param, callback) 결제창 호출
       this.IMP.request_pay({ // param
         pg : 'kcp',
         pay_method : 'card',
-        merchant_uid: "order_no_0004", // 상점에서 생성한 고유 주문번호. IMP.request_pay를 호출하기 전에 서버에서 데이터베이스에 주문 레코드를 생성하여 해당 레코드의 주문번호를 param.merchant_uid 에 지정하기를 권장합니다. 결제 프로세스 완료 후 해당 주문번호를 서버에서 조회하여 결제 위변조 여부를 검증하는데 필요합니다.
+        merchant_uid: this.orderNum, // 상점에서 생성한 고유 주문번호. IMP.request_pay를 호출하기 전에 서버에서 데이터베이스에 주문 레코드를 생성하여 해당 레코드의 주문번호를 param.merchant_uid 에 지정하기를 권장합니다. 결제 프로세스 완료 후 해당 주문번호를 서버에서 조회하여 결제 위변조 여부를 검증하는데 필요합니다.
         name : '주문명:결제테스트',
-        amount : 1000,
+        amount : this.total,
         buyer_email : 'iamport@siot.do',
         buyer_name : '구매자이름',
         buyer_tel : '010-1234-5678',

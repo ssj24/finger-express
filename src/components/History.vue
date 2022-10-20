@@ -1,7 +1,7 @@
 <template>
 	<div v-if = this.$store.state.isLogin class="d-flex flex-column align-center justify-center my-12" style="width: 100%;">
 		<v-row class="main-row mb-3" >
-			<v-col cols="12" md="7">
+			<v-col cols="12">
 				<h1 class="text-h4 text-md-h3 text-start">{{ this.$store.state.name ? this.$store.state.name : username }}<span class="text-h5 text-md-h4">님의 주문 내역</span></h1>
 			</v-col>
 		</v-row>

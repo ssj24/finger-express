@@ -3,7 +3,7 @@
 	<section class="my-10">
 		<v-row class="mx-auto mt-10">
 			<v-col cols="12" class="mb-5 text-lg-center subtitle-col">
-				<h1>Finger express는...</h1>
+				<h2>Finger express는...</h2>
 				<p class="text-subtitle-1 mb-0">녹음된 파일을 정확한 텍스트로 만들어 드립니다</p>
 			</v-col>
 			<v-col class="mx-auto" cols="12" md="6" v-for="(service, i) in services" :key="i">
@@ -12,6 +12,9 @@
 					class="pa-3"
 					height="348px"
 					max-width="445px"
+					:data-aos="i === 0 || i === 2 ? 'fade-right' : 'fade-left'"
+					data-aos-duration="2000"
+					data-aos-anchor-placement="top-bottom"
 				>
 					<v-img
 						:src=service.img
@@ -28,16 +31,19 @@
 			</v-col>
 		</v-row>
 	</section>
-	<section class="my-16">
+	<section class="my-16"  data-aos="fade-up" data-aos-anchor-placement="top-bottom" >
 		<v-row class="mx-auto">
 			<v-col cols="12" class="mb-5 text-lg-center subtitle-col">
-				<h1>Finger express의 프로세스</h1>
+				<h2>Finger express의 프로세스</h2>
 				<p class="text-subtitle-1 mb-0">작업은 다음의 순서로 진행됩니다</p>
 			</v-col>
 			<v-col v-for="(process, i) in processes" :key="i">
 				<v-card
 					class="mx-auto"
 					max-width="344"
+					data-aos="zoom-in"
+					data-aos-duration="2000"
+					data-aos-anchor-placement="top-bottom"
 				>
 					<v-img
 						contain

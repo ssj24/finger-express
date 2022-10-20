@@ -2,7 +2,7 @@
 	<section class="my-10">
 		<v-row class="mx-auto mt-10">
 			<v-col cols="12" class="mb-5 text-lg-center subtitle-col">
-				<h1>녹취록 작성을 통한 승소 경험</h1>
+				<h2>녹취록 작성을 통한 승소 경험</h2>
 				<p class="text-subtitle-1 mb-0">
 					부당해고, 성희롱, 성추행, 금전 문제, 채권 문제, 법정 재판 녹취록, 이혼 관련, 위자료 관련, 양육권 관련, 상속 관련, 각종 분쟁 관련, <br />
 					모욕죄 관련, 종중 관련, 사기 사건 관련, 공갈 및 협박 관련, 욕설 관련 사건 등 녹취록 작성 경험을 통한 다양한 승소 경험 </p>
@@ -11,7 +11,7 @@
 				cols="12" md="6"
 				class="mx-auto"
 				v-for="(review, i) in reviews" :key="i">
-				<v-card>
+				<v-card data-aos="zoom-out" data-aos-anchor-placement="top-bottom">
 					<v-card-subtitle>
 						{{review.content}}
 					</v-card-subtitle>

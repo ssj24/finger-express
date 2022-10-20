@@ -22,7 +22,7 @@
         </p>
         
       </v-col>
-      <v-col cols="12" md="5" class="d-flex flex-column justify-center align-center">
+      <v-col cols="12" md="5" class="d-flex flex-column justify-center align-center" data-aos="zoom-out" data-aos-duration="3000">
         <v-img
           src="../assets/thunderBig.png"
           class="shrink"
@@ -49,34 +49,33 @@
       </v-col>
     </v-row>
     <!-- components -->
-    <Process />
-    <Review />
+    <Process data-aos="fade-up" data-aos-anchor-placement="top-bottom" />
+    <Price data-aos="fade-up" data-aos-anchor-placement="center-bottom" />
+    <Review data-aos="fade-up" data-aos-anchor-placement="center-center" />
 
     <!-- banners -->
-    <section class="my-5">
+    <section class="my-5" data-aos="fade-up" data-aos-anchor-placement="center-center">
       <v-row class="mx-auto mt-10">
         <v-col cols="12" class="mb-5 text-lg-center subtitle-col">
-          <h1>고객사</h1>
+          <h2>고객사</h2>
         </v-col>
         <v-col cols="12" md="6" lg="3" v-for="(firm, i) in firms" :key="i">
           <v-card
             class="mx-auto pt-3"
             max-width="334"
+            data-aos="zoom-out"
+            data-aos-anchor-placement="center-bottom"
           >
             <v-img
-              v-if=firm.img
               class="mx-auto"
               contain
               :src=firm.img
               height="100px"
               max-width="200px"
             ></v-img>
-            <v-card-subtitle v-if=firm.img class="text-center">
+            <v-card-subtitle class="text-center">
               {{firm.title}}
             </v-card-subtitle>
-            <v-card-title v-else style="height: 154px" class="justify-center">
-              {{firm.title}}
-            </v-card-title>
           </v-card>
         </v-col>
       </v-row>
@@ -87,6 +86,7 @@
 <script>
 import Process from './Process.vue';
 import Review from './Review.vue';
+import Price from './Price';
 
 export default {
   name: 'LandingHome',
@@ -95,7 +95,8 @@ export default {
   },
   components: {
     Process,
-    Review
+    Review,
+    Price,
   },
   data: () => ({
     firms: [
@@ -172,7 +173,7 @@ export default {
         title: "반도건설",
       },
       {
-        img: null,
+        img: require("../assets/logos/enterprise.png"),
         title: "그 외 다수",
       },
     ]
