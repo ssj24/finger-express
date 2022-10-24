@@ -70,7 +70,10 @@
               <v-row class="ma-0 pa-0 footer-row align-center" style="font-size: 10px;">
                 <p>COPYRIGHT © TEBAH SOFT. 2021. ALL RIGHTS RESERVED.</p>
                 <v-col class="d-flex justify-end">
-                  <v-btn @click="readFile(true)" plain class="pa-0">
+                  <v-btn @click="readFile('open')" plain class="pa-0">
+                    오픈소스
+                  </v-btn>
+                  <v-btn @click="readFile('personal')" plain class="pa-0">
                     개인정보보호규정
                   </v-btn>
                   <v-btn @click="readFile(false)" plain class="pa-0">
@@ -116,8 +119,10 @@ export default {
     viewHistory(val) {
       this.checkHistory = val;
     },
-    readFile(bool) {
-      if (bool) {
+    readFile(val) {
+      if (val === 'open'){
+        window.open('/finger-express/Attribution.pdf', '_blank')
+      } else if (val === 'personal') {
         window.open('/finger-express/private_guard.pdf', '_blank')
       } else {
         window.open('/finger-express/usage_rule.pdf', '_blank')

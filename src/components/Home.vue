@@ -51,10 +51,10 @@
     <!-- components -->
     <Process data-aos="fade-up" data-aos-anchor-placement="top-bottom" />
     <Price data-aos="fade-up" data-aos-anchor-placement="center-bottom" />
-    <Review data-aos="fade-up" data-aos-anchor-placement="center-center" />
+    <Review data-aos="fade-up" data-aos-anchor-placement="top-bottom" />
 
     <!-- banners -->
-    <section class="my-5" data-aos="fade-up" data-aos-anchor-placement="center-center">
+    <section class="my-5" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
       <v-row class="mx-auto mt-10">
         <v-col cols="12" class="mb-5 text-lg-center subtitle-col">
           <h2>고객사</h2>
