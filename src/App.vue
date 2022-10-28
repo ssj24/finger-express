@@ -37,6 +37,7 @@
     </v-app-bar>
 
     <v-main class="d-flex justify-center align-center">
+      <button @click="callAxios">click</button>
       <Home
         v-if="!applicationForm && !checkHistory"
         :application-form="applicationForm"
@@ -94,7 +95,7 @@
 import Home from './components/Home';
 import Form from './components/Form';
 import History from './components/History';
-
+import axios from 'axios';
 export default {
   name: 'App',
 
@@ -109,6 +110,17 @@ export default {
     checkHistory: false,
   }),
   methods: {
+    callAxios() {
+      axios.get('http://192.168.31.33:8000/test/')
+        .then( res => {
+          // POST요청 성공시 실행할 코드~~
+          console.log(res);
+        }).catch( (err)=>{
+          // 실패시 실행할 코드
+          console.log(err);
+        })
+        console.log(this.formData);
+    },
     reloadPage() {
       window.location.reload();
     },

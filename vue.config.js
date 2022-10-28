@@ -4,5 +4,5 @@ module.exports = defineConfig({
     'vuetify'
   ],
   publicPath: '/finger-express/',
-  outputDir: 'docs'
+  outputDir: 'docs',
 })

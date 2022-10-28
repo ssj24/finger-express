@@ -257,6 +257,8 @@
 
 <script>
 import Payment from './Payment.vue'
+import axios from 'axios';
+
 export default {
     name: 'applicationForm',
     components: {
@@ -364,27 +366,27 @@ export default {
 					"sent_no": 13
 				},
 			];
-			let postcode = '';
+			let postcode = '111';
 			let detailAddress = '';
 			return {
 				valid: true,
-				name: '',
+				name: 'abc',
 				nameRules: [
 					v => !!v || '이름을 입력해주세요',
 					v => (v && v.length <= 10) || '10자 이내로 입력해주세요',
 				],
 				show: false,
-				password: '',
+				password: 'aaaaaaaa',
 				passwordRules: [
 					v => !!v || '비밀번호를 입력해주세요.',
 					v => (v && v.length > 8) || '8자 이상 입력해주세요',
 				],
-				phone: '',
+				phone: '010-999-9999',
 				phoneRules: [
 					v => !!v || '휴대폰 번호를 입력해주세요.',
 					v => /01[016789]-[^0][0-9]{2,3}-[0-9]{3,4}/.test(v) || '01x-xxxx-xxxx'
 				],
-				email: '',
+				email: 'a@b.c',
 				emailRules: [
 					v => !!v || '이메일을 입력해주세요',
 					v => /.+@.+\..+/.test(v) || '유효한 이메일 주소가 아닙니다',
@@ -424,6 +426,14 @@ export default {
 						delivery: this.select,
 						file: this.file
 					}
+					axios.get('https://cors-anywhere.herokuapp.com/http://192.168.31.33:8000/test/')
+					.then( res => {
+						// POST요청 성공시 실행할 코드~~
+						console.log(res);
+					}).catch( (err)=>{
+						// 실패시 실행할 코드
+						console.log(err);
+					})
 					console.log(this.formData);
 				}
 				this.formData = {

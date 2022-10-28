@@ -4,6 +4,7 @@ import vuetify from './plugins/vuetify'
 import store from './store'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+// import axios from 'axios';
 
 Vue.config.productionTip = false
 
