@@ -43,7 +43,11 @@
         :application-form="applicationForm"
         @clicked="compChanged"
       />
-      <Form v-else-if="applicationForm && !checkHistory" />
+      <Form
+        v-else-if="applicationForm && !checkHistory"
+        :mode="mode"
+        @changeMode="modeChanged"
+        />
       <History v-else-if="checkHistory"/>
     </v-main>
     <v-footer
@@ -108,6 +112,7 @@ export default {
   data: () => ({
     applicationForm: false,
     checkHistory: false,
+    mode: false,
   }),
   methods: {
     callAxios() {
@@ -125,8 +130,12 @@ export default {
       window.location.reload();
     },
     compChanged(val) {
+      this.mode = false;
       this.applicationForm = val;
       if (val) this.checkHistory = false;
+    },
+    modeChanged() {
+      this.mode = true;
     },
     viewHistory(val) {
       this.checkHistory = val;

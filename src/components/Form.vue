@@ -1,5 +1,5 @@
 <template>
-<div v-if="!isComplete || !file" class="d-flex flex-column align-center justify-center">
+<div v-if="!mode" class="d-flex flex-column align-center justify-center">
 	<v-col cols="11" md="8" lg="6">
 		<v-form
 			ref="form"
@@ -252,19 +252,20 @@
 		</v-form>
 	</v-col>
 </div>
-<Payment v-else-if="isComplete && file" :formData="formData" class="d-flex align-center justify-center my-12" />
+<Payment v-else :formData="formData" class="d-flex align-center justify-center my-12" />
 </template>
 
 <script>
 import Payment from './Payment.vue'
-import axios from 'axios';
 
 export default {
     name: 'applicationForm',
     components: {
       Payment
     },
-
+		props: {
+			mode: Boolean,
+		},
     data: () => {
 			let previewText = [
 				// {
@@ -426,15 +427,15 @@ export default {
 						delivery: this.select,
 						file: this.file
 					}
-					axios.get('https://cors-anywhere.herokuapp.com/http://192.168.31.33:8000/test/')
-					.then( res => {
-						// POST요청 성공시 실행할 코드~~
-						console.log(res);
-					}).catch( (err)=>{
-						// 실패시 실행할 코드
-						console.log(err);
-					})
-					console.log(this.formData);
+					// axios.get('https://cors-anywhere.herokuapp.com/http://192.168.31.33:8000/test/')
+					// .then( res => {
+					// 	// POST요청 성공시 실행할 코드~~
+					// 	console.log(res);
+					// }).catch( (err)=>{
+					// 	// 실패시 실행할 코드
+					// 	console.log(err);
+					// })
+					// console.log(this.formData);
 				}
 				this.formData = {
 					name: this.name || '',
@@ -447,6 +448,7 @@ export default {
 					file: this.file
 				}
 				this.isComplete = true;
+				this.$emit('changeMode', true);
       },
       reset () {
         this.$refs.form.reset();

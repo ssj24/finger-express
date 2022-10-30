@@ -115,7 +115,7 @@ export default {
   mounted() {
     console.log(this.formData.file);
     this.totalDuration = Math.ceil(this.formData.file.duration / 60);
-    this.extraDuration = Math.ceil((this.formData.file.duration - 300) / 60);
+    this.extraDuration = this.totalDuration > 5 ? Math.ceil((this.formData.file.duration - 300) / 60) : 0;
     this.total = this.basicPrice + this.extraDuration * this.extraPrice;
   },
   methods: {
