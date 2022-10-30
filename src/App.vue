@@ -99,7 +99,7 @@
 import Home from './components/Home';
 import Form from './components/Form';
 import History from './components/History';
-import axios from 'axios';
+
 export default {
   name: 'App',
 
@@ -116,7 +116,7 @@ export default {
   }),
   methods: {
     callAxios() {
-      axios.get('http://192.168.31.33:8000/test/')
+      this.$http.get('api/1/news')
         .then( res => {
           // POST요청 성공시 실행할 코드~~
           console.log(res);
@@ -124,7 +124,6 @@ export default {
           // 실패시 실행할 코드
           console.log(err);
         })
-        console.log(this.formData);
     },
     reloadPage() {
       window.location.reload();

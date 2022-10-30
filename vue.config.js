@@ -5,4 +5,7 @@ module.exports = defineConfig({
   ],
   publicPath: '/finger-express/',
   outputDir: 'docs',
+  devServer: {
+    proxy : 'https://newsdata.io/'
+  }
 })
