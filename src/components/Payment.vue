@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
 
 export default {
   name: 'formPayment',
@@ -178,19 +178,20 @@ export default {
       }, function (rsp) { // callback
       if (rsp.success) { // 결제 성공 시: 결제 승인 또는 가상계좌 발급에 성공한 경우
         // axios로 HTTP 요청
-        axios({
-          url: "http://localhost:8080/", // 예: https://www.myservice.com/payments/complete
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          data: {
-            imp_uid: rsp.imp_uid,
-            merchant_uid: rsp.merchant_uid
-          }
-        }).then((data) => {
-          // 서버 결제 API 성공시 로직
-          console.log('axios.success');
-          console.log(data);
-        })
+        // axios({
+        //   url: "http://localhost:8080/", // 예: https://www.myservice.com/payments/complete
+        //   method: "post",
+        //   headers: { "Content-Type": "application/json" },
+        //   data: {
+        //     imp_uid: rsp.imp_uid,
+        //     merchant_uid: rsp.merchant_uid
+        //   }
+        // }).then((data) => {
+        //   // 서버 결제 API 성공시 로직
+        //   console.log('axios.success');
+        //   console.log(data);
+        // })
+        console.log('callback');
       } else {
         alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
       }

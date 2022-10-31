@@ -213,12 +213,12 @@
 					</v-card-text>
 				</v-card>
 			</v-row>
-			<v-checkbox
+			<!-- <v-checkbox
 				v-model="checkbox"
 				:rules="[v => !!v || '동의하지 않으시면 다음 단계로 넘어갈 수 없습니다']"
 				label="이용약관"
 				required
-			></v-checkbox>
+			></v-checkbox> -->
 			<!-- 하단 버튼 -->
 			<v-row class="d-flex justify-end">
 				<v-col class="d-flex justify-end pr-0">
@@ -256,7 +256,8 @@
 </template>
 
 <script>
-import Payment from './Payment.vue'
+import Payment from './Payment.vue';
+import axios from 'axios';
 
 export default {
     name: 'applicationForm',
@@ -377,7 +378,7 @@ export default {
 					v => (v && v.length <= 10) || '10자 이내로 입력해주세요',
 				],
 				show: false,
-				password: 'aaaaaaaa',
+				password: 'aaaaaaaaa',
 				passwordRules: [
 					v => !!v || '비밀번호를 입력해주세요.',
 					v => (v && v.length > 8) || '8자 이상 입력해주세요',
@@ -395,7 +396,7 @@ export default {
 				postcode,
 				address: postcode ? postcode + ')' + detailAddress : '',
 				extraAddress: '',
-				select: null,
+				select: '이메일',
 				delivery: ['이메일', '등기'],
 				file: null,
 				fileRules: [
@@ -427,26 +428,25 @@ export default {
 						delivery: this.select,
 						file: this.file
 					}
-					// axios.get('https://cors-anywhere.herokuapp.com/http://192.168.31.33:8000/test/')
-					// .then( res => {
-					// 	// POST요청 성공시 실행할 코드~~
-					// 	console.log(res);
-					// }).catch( (err)=>{
-					// 	// 실패시 실행할 코드
-					// 	console.log(err);
-					// })
-					// console.log(this.formData);
+					axios({					// axios 통신 시작
+          url: "/test/",	// back 서버 주소
+          method: "POST",
+					data: this.formData
+        }).
+        then(res => {				// back 서버로부터 응답받으면
+            alert(res);		// back 서버에서 보낸 message 출력
+        }).catch(err => alert(err));
 				}
-				this.formData = {
-					name: this.name || '',
-					password: this.password || '',
-					phone: this.phone || '',
-					email: this.email || '',
-					postcode: this.postcode || '',
-					address: this.address + this.extraAddress || '',
-					delivery: this.select || '',
-					file: this.file
-				}
+				// this.formData = {
+				// 	name: this.name || '',
+				// 	password: this.password || '',
+				// 	phone: this.phone || '',
+				// 	email: this.email || '',
+				// 	postcode: this.postcode || '',
+				// 	address: this.address + this.extraAddress || '',
+				// 	delivery: this.select || '',
+				// 	file: this.file
+				// }
 				this.isComplete = true;
 				this.$emit('changeMode', true);
       },

@@ -6,6 +6,11 @@ module.exports = defineConfig({
   publicPath: '/finger-express/',
   outputDir: 'docs',
   devServer: {
-    proxy : 'https://newsdata.io/'
+    proxy: {
+      '/test': { 
+        target: 'http://192.168.31.33:8000',
+        changeOrigin: true,
+      }, 
+    },
   }
 })
