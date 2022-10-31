@@ -7,7 +7,7 @@ module.exports = defineConfig({
   outputDir: 'docs',
   devServer: {
     proxy: {
-      '/test': { 
+      '^/test': { 
         target: 'http://192.168.31.33:8000',
         changeOrigin: true,
       }, 
