@@ -252,7 +252,7 @@
 		</v-form>
 	</v-col>
 </div>
-<Payment v-else :formData="formData" class="d-flex align-center justify-center my-12" />
+<Payment v-else :formData="formData" :file="file" class="d-flex align-center justify-center my-12" />
 </template>
 
 <script>
@@ -426,15 +426,22 @@ export default {
 						postcode: this.postcode || '',
 						address: this.address + this.extraAddress || '',
 						delivery: this.select,
-						file: this.file
+						// file: this.file
 					}
+					let frm = new FormData();
+					frm.append('file', this.file)
+					this.formData.file = frm;
 					axios({					// axios 통신 시작
           url: "/test/",	// back 서버 주소
           method: "POST",
-					data: this.formData
+					data: this.formData,
+					headers: {
+						'Content-Type': 'multipart/form-data'
+					}
         }).
         then(res => {				// back 서버로부터 응답받으면
             alert(res);		// back 서버에서 보낸 message 출력
+						console.log(this.formData);
         }).catch(err => alert(err));
 				}
 				// this.formData = {

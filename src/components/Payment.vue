@@ -29,7 +29,7 @@
     <v-card class="py-3 px-5">
       <v-card-title class="pb-0" style="width: 100%;">
         <p class="text-sm-left font-weight-black text-truncate ">
-          {{formData.file.name}}
+          {{file.name}}
         </p>
       </v-card-title>
       <p class="text-subtitle-1 text-sm-left">
@@ -99,6 +99,7 @@ export default {
   name: 'formPayment',
   props: [
     'formData',
+    'file',
   ],
   data: () => ({
     totalDuration: 0,
@@ -113,9 +114,9 @@ export default {
     orderNum: Math.floor(Math.random()* 10000000000),
   }),
   mounted() {
-    console.log(this.formData.file);
-    this.totalDuration = Math.ceil(this.formData.file.duration / 60);
-    this.extraDuration = this.totalDuration > 5 ? Math.ceil((this.formData.file.duration - 300) / 60) : 0;
+    console.log(this.file);
+    this.totalDuration = Math.ceil(this.file.duration / 60);
+    this.extraDuration = this.totalDuration > 5 ? Math.ceil((this.file.duration - 300) / 60) : 0;
     this.total = this.basicPrice + this.extraDuration * this.extraPrice;
   },
   methods: {
