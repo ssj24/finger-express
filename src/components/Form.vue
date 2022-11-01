@@ -426,11 +426,8 @@ export default {
 						postcode: this.postcode || '',
 						address: this.address + this.extraAddress || '',
 						delivery: this.select,
-						// file: this.file
+						file: this.file
 					}
-					let frm = new FormData();
-					frm.append('file', this.file)
-					this.formData.file = frm;
 					axios({					// axios 통신 시작
           url: "/test/",	// back 서버 주소
           method: "POST",
