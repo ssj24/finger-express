@@ -68,8 +68,8 @@
                 <p>사업장주소: 대전 유성구 대덕대로512번길 20</p>
                 <p>통신판매신고: 제2022-대전유성-0475호</p>
                 <p>이메일: tebahsoft@gmail.com</p>
-                <p>고객센터: 070-7565-8698</p>
-                <p>개인정보책임: 오정섭(070-7565-8698)</p>
+                <p>고객센터: 042-864-5566</p>
+                <p>개인정보책임: 오정섭(070-4456-7100)</p>
               </v-row>
               <v-row class="ma-0 pa-0 footer-row align-center" style="font-size: 10px;">
                 <p>COPYRIGHT © TEBAH SOFT. 2021. ALL RIGHTS RESERVED.</p>
