@@ -32,22 +32,26 @@
       <v-spacer></v-spacer>
 
       <v-btn class="white--text font-weight" plain @click="compChanged(true)">신청하기</v-btn>
-      <v-btn class="white--text font-weight" plain @click="viewHistory(true)">{{ this.$store.state.isLogin ? '주문 내역' : '로그인' }}</v-btn>
+      <v-btn class="white--text font-weight" plain >장바구니</v-btn>
+      <v-btn class="white--text font-weight" plain v-if="this.$store.state.isLogin">마이페이지</v-btn>
+      <v-btn class="white--text font-weight" plain @click="signIn">로그인</v-btn>
       <v-btn class="white--text font-weight" plain @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
     </v-app-bar>
 
-    <v-main class="d-flex justify-center align-center">
+    <v-main class="d-flex justify-center align-center" v-if="!toSignIn">
       <Home
-        v-if="!applicationForm && !checkHistory"
+        v-if="!applicationForm"
         :application-form="applicationForm"
         @clicked="compChanged"
       />
       <Form
-        v-else-if="applicationForm && !checkHistory"
+        v-else-if="applicationForm"
         :mode="mode"
         @changeMode="modeChanged"
         />
-      <History v-else-if="checkHistory"/>
+    </v-main>
+    <v-main class="d-flex justify-center align-center" v-else>
+      <Sign-up />
     </v-main>
     <v-footer
       padless
@@ -97,7 +101,7 @@
 <script>
 import Home from './components/Home';
 import Form from './components/Form';
-import History from './components/History';
+import SignUp from './components/Signup.vue';
 // import axios from 'axios';
 
 export default {
@@ -106,12 +110,11 @@ export default {
   components: {
     Home,
     Form,
-    History,
+    SignUp,
   },
-
   data: () => ({
     applicationForm: false,
-    checkHistory: false,
+    toSignIn: false,
     mode: false,
   }),
   methods: {
@@ -135,8 +138,8 @@ export default {
     modeChanged() {
       this.mode = true;
     },
-    viewHistory(val) {
-      this.checkHistory = val;
+    signIn() {
+      this.toSignIn = true;
     },
     readFile(val) {
       if (val === 'open'){

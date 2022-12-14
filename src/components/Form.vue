@@ -88,10 +88,11 @@
 				<v-col cols="8" md="10"
 				>
 				<v-file-input
-					v-model="file"
+					v-model="files"
 					color="orange accent-4"
 					class="pa-0"
 					counter
+					multiple
 					label="파일 업로드"
 					accept="audio/*, video/*"
 					@change="uploadHandler"
@@ -107,7 +108,7 @@
 						color="accent"
 						outlined
 						@click="showPreview"
-						:disabled="file == null ? true : false"
+						:disabled="files.length ? true : false"
 					>
 						미리보기
 					</v-btn>
@@ -120,24 +121,28 @@
 					class="pt-0"
 				>
 					<!-- <audio id="audio-preview" controls v-show="file != ''"/> -->
-					<v-card @drop="dragFile" class="pa-5 d-flex justify-center align-center dragContainer">
-						<span v-if="!file">
+					<v-card @drop="dragFile" class="pa-5 dragContainer">
+						<span v-if="!files.length" class="emptyFileName">
 							<v-icon left>
 								mdi-music-note-plus
-							</v-icon>파일을 드래그해서 추가해주세요
+							</v-icon>
+							파일을 드래그해서 추가해주세요
 						</span>
-						<span v-else>
-							<div class="text-subtitle-2">{{file.sizeInMB}}MB</div>
-							<p class="text-subtitle-1 text--primary">
-								{{ file.name }}
-							</p>
+						<span v-else v-for="(f, i) in files" :key="i" class="fileName">
+							<span>
+								<div class="text-subtitle-2">{{f.sizeInMB}}MB</div>
+								<p class="text-subtitle-1 text--primary">
+									{{ f.name }}
+								</p>
+							</span>
+							<span @click="deleteF(i)">X</span>
 							<!-- <v-chip
 								color="accent"
 								class="col-11 chip-overflow"
 								style="line-height: 100%;"
 								label
 							>
-								{{ file.name }}
+								{{ f.name }}
 							</v-chip> -->
 						</span>
 					</v-card>
@@ -252,7 +257,7 @@
 		</v-form>
 	</v-col>
 </div>
-<Payment v-else :formData="formData" :file="file" class="d-flex align-center justify-center my-12" />
+<Payment v-else :formData="formData" :files="files" class="d-flex align-center justify-center my-12" />
 </template>
 
 <script>
@@ -398,7 +403,7 @@ export default {
 				extraAddress: '',
 				select: '이메일',
 				delivery: ['이메일', '등기'],
-				file: null,
+				files: [],
 				fileRules: [
 					v => !!v || '파일을 등록해주세요'
 				],
@@ -412,7 +417,7 @@ export default {
     },
 		watch: {
 			selected(newVal) {
-				console.log(newVal);
+				console.log('watch-selected', newVal);
 			}
     },
     methods: {
@@ -426,10 +431,20 @@ export default {
 						postcode: this.postcode || '',
 						address: this.address + this.extraAddress || '',
 						delivery: this.select,
-						file: this.file
+						file: this.files
 					}
+					console.log(this.formData);
+					const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
+					if (Array.isArray(val)) {
+						val.forEach(v => fd.append(key, v))
+					} else {
+						fd.append(key, val)
+					}
+					return fd
+				}, new FormData());
+				console.log(getFormData(this.formData));
 					axios({					// axios 통신 시작
-          url: "/test/",	// back 서버 주소
+          url: "/stt",	// back 서버 주소
           method: "POST",
 					data: this.formData,
 					headers: {
@@ -441,6 +456,7 @@ export default {
 						console.log(this.formData);
         }).catch(err => alert(err));
 				}
+
 				// this.formData = {
 				// 	name: this.name || '',
 				// 	password: this.password || '',
@@ -498,17 +514,18 @@ export default {
 			},
 			showFile() {
 				window.URL = window.URL || window.webkitURL;
-        let video = document.createElement('video');
-				video.addEventListener('loadedmetadata', () => {
-					window.URL.revokeObjectURL(video.src);
-					this.file.duration = video.duration;
-				});
-        video.preload = 'metadata';
-        video.src = URL.createObjectURL(this.file);
-				this.file.sizeInMB = (this.file.size / (1024*1024)).toFixed(2);
+				let video = document.createElement('video');
+				for (const f of this.files) {
+					video.addEventListener('loadedmetadata', () => {
+						window.URL.revokeObjectURL(video.src);
+						f.duration = video.duration;
+					});
+					video.preload = 'metadata';
+					video.src = URL.createObjectURL(f);
+					f.sizeInMB = (f.size / (1024*1024)).toFixed(2);
+				}
 			},
-			uploadHandler(e) {
-				this.file = e;
+			uploadHandler() {
 				this.showFile();
 				// this.previewAudio();
 			},
@@ -523,9 +540,14 @@ export default {
       //   });
 			// },
 			dragFile(e) {
-        this.file = e.dataTransfer.files[0];
+				for (const f of e.dataTransfer.files) {
+					this.files.push(f);
+				}
 				this.showFile();
       },
+			deleteF(index) {
+				this.files.splice(index, 1);
+			},
 			showPreview() {
 				this.preview = true;
 			},
@@ -573,13 +595,35 @@ export default {
 				});
       },
     },
-
 }
 </script>
 
 <style lang="scss" scoped>
 .dragContainer {
-	height: 150px;
+	min-height: 120px;
+	height: auto;
+}
+.emptyFileName {
+	height: 120px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.fileName {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.fileName span:nth-child(2) {
+	text-align: center;
+	padding: 5px 10px;
+	border-radius: 50%;
+}
+.fileName span:nth-child(2):hover {
+	cursor: pointer;
+	color: red;
+	background-color: rgba(255, 0, 0, 0.209);
 }
 .plainChip {
 	background: transparent !important;
