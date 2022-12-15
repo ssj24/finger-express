@@ -2,10 +2,12 @@
   <v-row class="d-flex flex-column align-center justify-center">
     <v-col cols="6">
       <v-form
+        v-if="isSignup"
         ref="form"
         v-model="valid"
         lazy-validation
       >
+        <div @click="isSignup = false;">click it</div>
         <v-text-field
           v-model="email"
           :rules="emailRules"
@@ -86,6 +88,28 @@
           send
         </v-btn>
       </v-form>
+      <v-form
+        v-else
+        ref="form"
+        v-model="valid"
+        lazy-validation
+      >
+        <div @click="isSignup = true;">click it</div>
+        <v-text-field
+          v-model="email"
+          :rules="emailRules"
+          label="이메일"
+          type="email"
+          required
+        ></v-text-field>
+        <v-text-field
+          v-model="pw"
+          :rules="passwordRules"
+          label="비밀번호"
+          type="password"
+          required
+        ></v-text-field>
+      </v-form>
     </v-col>
   </v-row>
 </template>
@@ -103,6 +127,7 @@ export default {
     let postcode = '';
     let detailAddress = '';
     return {
+      isSignup: false,
       email,
       emailRules: [
         v => !!v || '필수 입력 값입니다.',
