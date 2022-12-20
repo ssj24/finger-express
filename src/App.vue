@@ -32,7 +32,7 @@
       <v-spacer></v-spacer>
 
       <v-btn class="white--text font-weight" plain @click="compChanged(true)">신청하기</v-btn>
-      <v-btn class="white--text font-weight" plain >장바구니</v-btn>
+      <!-- <v-btn class="white--text font-weight" plain >장바구니</v-btn> -->
       <v-btn class="white--text font-weight" plain v-if="this.$store.state.isLogin">마이페이지</v-btn>
       <v-btn class="white--text font-weight" plain @click="signIn">로그인</v-btn>
       <v-btn class="white--text font-weight" plain @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
@@ -44,7 +44,7 @@
         :application-form="applicationForm"
         @clicked="compChanged"
       />
-      <Form
+      <Application
         v-else-if="applicationForm"
         :mode="mode"
         @changeMode="modeChanged"
@@ -58,8 +58,8 @@
 </template>
 
 <script>
-import Home from './components/Home';
-import Form from './components/Form';
+import Home from './components/Home.vue';
+import Application from './components/Application.vue';
 import SignUp from './components/Signup.vue';
 import Footer from './components/Footer.vue';
 // import axios from 'axios';
@@ -69,7 +69,7 @@ export default {
 
   components: {
     Home,
-    Form,
+    Application,
     SignUp,
     Footer,
   },
@@ -117,6 +117,10 @@ export default {
 }
 #no-background-hover::before {
    background-color: transparent !important;
+}
+main {
+  width: 100%;
+  height: auto;
 }
 
 </style>

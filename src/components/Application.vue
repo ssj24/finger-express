@@ -1,0 +1,796 @@
+<template>
+<div v-if="!mode" class="d-flex flex-column justify-center">
+	<v-row class="form-header flex-column align-center justify-center">
+		<h1 class="mb-5">
+			녹취록 신청하기
+		</h1>
+		<div class="description d-flex flex-column justify-center">
+			<p>녹취록은 현재 화면에 업로드하신 모든 파일들을 하나의 녹취록 문서로 묶어서 드립니다.</p>
+			<p>서로 다른 문서로 작업이 필요하신 경우, 신청을 별도로 해 주세요.</p>
+			<p>장바구니를 통하여 한번에 결재가 가능합니다.</p>
+		</div>
+	</v-row>
+	<v-row class="form-contents ma-0">
+		<v-col cols="11" md="9" class="d-flex flex-wrap">
+			<v-row>
+				<v-col cols="12" lg="4">
+					<v-card class="pa-5">
+						<v-card-title>
+							전달 방식
+						</v-card-title>
+						<v-card-subtitle>
+							묶음배송 가능할 경우, 등기비용, CD비용은 한 번만 청구됩니다.
+						</v-card-subtitle>
+						<v-radio-group v-model="delivery">
+							<v-radio
+								label="이메일 배송 (PDF로 제공됩니다)"
+								value="1"
+							></v-radio>
+							<v-radio
+								label="등기배송 (+10,000원)"
+								value="2"
+							></v-radio>
+							<v-radio
+								label="등기배송 + CD (+17,000원)"
+								value="3"
+							></v-radio>
+						</v-radio-group>
+						<hr>
+						<v-checkbox
+							v-model="authentication"
+							label="공증 필요 (+5,000원)"
+						></v-checkbox>
+					</v-card>
+				</v-col>
+				<v-col cols="12" lg="8">
+					<v-card class="pa-5">
+						<v-card-title>
+							파일 첨부
+						</v-card-title>
+						<v-card-subtitle>
+							하나당 최대 ??MB의 파일을 10개까지 첨부하실 수 있습니다.
+						</v-card-subtitle>
+						<v-form
+							ref="form"
+							v-model="valid"
+							lazy-validation
+						>
+							<!-- 파일 업로드 -->
+							<v-row class="pa-0">
+								<v-col cols="8" md="10"
+								>
+								<v-file-input
+									v-model="files"
+									color="orange accent-4"
+									class="pa-0"
+									counter
+									multiple
+									label="파일 업로드"
+									accept="audio/*, video/*"
+									@change="uploadHandler"
+									placeholder="음성 파일을 선택해주세요"
+									:rules="fileRules"
+									id="fileInput"
+								>
+								</v-file-input>
+								</v-col>
+								<v-col cols="4" md="2" class="d-flex justify-center align-center mb-4">
+									<v-btn
+										width="100%"
+										color="accent"
+										outlined
+										@click="tempPreview"
+									>
+										<!-- :disabled="files.length ? true : false" -->
+										미리보기
+									</v-btn>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col cols="12"
+									@dragover.prevent
+									@drop.prevent
+									class="pt-0"
+								>
+									<!-- <audio id="audio-preview" controls v-show="file != ''"/> -->
+									<v-card @drop="dragFile" class="pa-5 dragContainer">
+										<span v-if="!files.length" class="emptyFileName">
+											<v-icon left>
+												mdi-music-note-plus
+											</v-icon>
+											파일을 드래그해서 추가해주세요
+										</span>
+										<span v-else v-for="(f, i) in files" :key="i" class="fileName">
+											<span>
+												<div class="text-subtitle-2">{{f.sizeInMB}}MB</div>
+												<p class="text-subtitle-1 text--primary">
+													{{ f.name }}
+												</p>
+											</span>
+											<span @click="deleteF(i)">X</span>
+											<!-- <v-chip
+												color="accent"
+												class="col-11 chip-overflow"
+												style="line-height: 100%;"
+												label
+											>
+												{{ f.name }}
+											</v-chip> -->
+										</span>
+									</v-card>
+								</v-col>
+							</v-row>
+
+						</v-form>
+					</v-card>
+				</v-col>
+			</v-row>
+			<v-row>
+				<v-col cols="12">
+					<v-card class="pa-5">
+						<Sentences :previewText="previewText" :showPreview="preview"/>
+						<!-- 하단 버튼 -->
+						<v-row class="d-flex justify-end">
+							<v-col class="d-flex justify-end pr-0">
+								<v-btn
+									plain
+									class="pa-0"
+									@click="reset"
+								>
+									<v-img
+										alt="reset"
+										class="shrink mr-2"
+										contain
+										src="../assets/undo-arrow.png"
+										transition="scale-transition"
+										width="20"
+									/>
+								</v-btn>
+							</v-col>
+							<v-col cols="4" md="2">
+								<v-btn
+									width="100%"
+									:disabled="!valid"
+									color="accent"
+									class="mr-4"
+									@click="validate"
+								>
+									등록
+								</v-btn>
+							</v-col>
+						</v-row>
+					</v-card>
+				</v-col>
+			</v-row>
+		</v-col>
+	</v-row>
+	
+</div>
+<Payment v-else :formData="formData" :files="files" class="d-flex align-center justify-center my-12" />
+</template>
+
+<script>
+import Payment from './Payment.vue';
+import Sentences from './Sentences.vue';
+import axios from 'axios';
+
+export default {
+    name: 'applicationComponent',
+    components: {
+      Payment,
+			Sentences,
+    },
+		props: {
+			mode: Boolean,
+		},
+    data: () => {
+			let previewText = [
+				// {
+				// 	"speaker": speaker, 
+				// 	"name": chr(ord(speaker) + 17), 
+				// 	"sentence": cur_text, 
+				// 	"first_sentence": "false",
+				// 	"quiet_time": 0, 
+				// 	"start": start_time, 
+				// 	"end": end_time, 
+				// 	"senti": "None", 
+				// 	"sent_no": 0,
+				// 	"sent_sub": 0, 
+				// 	"confidence": sent_confidence
+				// },
+				{},
+				{
+					"start": "0001",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 0
+				},
+				{
+					"start": "0005",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 1
+				},
+				{
+					"start": "0007",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "zzz2",
+					"sent_no": 2
+				},
+				{
+					"start": "0009",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 3
+				},
+				{
+					"start": "0012",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "zzz2",
+					"sent_no": 4
+				},
+				{
+					"start": "0014",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 5
+				},
+				{
+					"start": "0017",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 6
+				},
+				{
+					"start": "0019",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "zzz2",
+					"sent_no": 7
+				},
+				{
+					"start": "0021",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 8
+				},
+				{
+					"start": "0022",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "zzz2",
+					"sent_no": 9
+				},
+				{
+					"start": "0023",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "333",
+					"sent_no": 10
+				},
+				{
+					"start": "0025",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "zzz2",
+					"sent_no": 11
+				},
+				{
+					"start": "0026",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "abc1",
+					"sent_no": 12
+				},
+				{
+					"start": "0030",
+					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
+					"name": "333",
+					"sent_no": 13
+				},
+			];
+			return {
+				valid: true,
+				delivery: 1,
+				authentication: false,
+				files: [],
+				fileRules: [
+					v => !!v || '파일을 등록해주세요'
+				],
+				preview: false,
+				previewText,
+				isComplete: false,
+				formData: {},
+			}
+    },
+		watch: {
+			selected(newVal) {
+				console.log('watch-selected', newVal);
+			}
+    },
+    methods: {
+      validate () {
+        if (this.files.length) {
+					const date = new Date();
+					this.formData = {
+						message: 'stt_analysis',
+						client_mail:'client@test.com',
+						stt_engine:'review',
+						time_info: `${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`,
+						files: this.files
+					}
+					console.log(this.formData);
+					// const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
+					// 	if (Array.isArray(val)) {
+					// 		val.forEach(v => fd.append(key, v))
+					// 	} else {
+					// 		fd.append(key, val)
+					// 	}
+					// 	return fd
+					// }, new FormData());
+					// console.log(getFormData(this.formData));
+					axios({					// axios 통신 시작
+          url: "/rest",	// back 서버 주소
+          method: "POST",
+					data: this.formData,
+					headers: {
+						'Content-Type': 'multipart/form-data'
+					}
+        }).then(res => {				// back 서버로부터 응답받으면
+            console.log(res);		// back 서버에서 보낸 message 출력
+						this.previewText = res.data[0].sentence;
+        }).catch(err => console.log(err));
+				}
+
+				// this.formData = {
+				// 	name: this.name || '',
+				// 	password: this.password || '',
+				// 	phone: this.phone || '',
+				// 	email: this.email || '',
+				// 	postcode: this.postcode || '',
+				// 	address: this.address + this.extraAddress || '',
+				// 	delivery: this.select || '',
+				// 	file: this.file
+				// }
+				this.isComplete = true;
+				// this.$emit('changeMode', true);
+      },
+      reset () {
+        this.$refs.form.reset();
+      },
+			showFile() {
+				window.URL = window.URL || window.webkitURL;
+				let video = document.createElement('video');
+				for (const f of this.files) {
+					video.addEventListener('loadedmetadata', () => {
+						window.URL.revokeObjectURL(video.src);
+						f.duration = video.duration;
+					});
+					video.preload = 'metadata';
+					video.src = URL.createObjectURL(f);
+					f.sizeInMB = (f.size / (1024*1024)).toFixed(2);
+					// const date = new Date();
+					// f.createdAt = `_${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
+					console.log(f);
+				}
+			},
+			uploadHandler() {
+				this.showFile();
+				// this.previewAudio();
+			},
+			// previewAudio(){
+			//   업로드한 파일 재생
+      //   let audio = document.getElementById('audio-preview');
+      //   let reader = new FileReader();
+
+      //   reader.readAsDataURL( this.file );
+      //   reader.addEventListener('load', function(){
+      //       audio.src = reader.result;
+      //   });
+			// },
+			dragFile(e) {
+				for (const f of e.dataTransfer.files) {
+					this.files.push(f);
+				}
+				this.showFile();
+      },
+			deleteF(index) {
+				this.files.splice(index, 1);
+			},
+			showPreview() {
+				if (this.files.length) {
+				const date = new Date();
+				this.formData = {
+					message: 'stt_analysis',
+					client_mail:'client@test.com',
+					stt_engine:'review',
+					time_info: `${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`,
+					files: this.files
+				}
+				console.log(this.formData);
+				const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
+					if (Array.isArray(val)) {
+						val.forEach(v => fd.append(key, v))
+					} else {
+						fd.append(key, val)
+					}
+					return fd
+				}, new FormData());
+				console.log(getFormData(this.formData));
+				axios({					// axios 통신 시작
+				url: "/rest",	// back 서버 주소
+				method: "POST",
+				data: this.formData,
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}).then(res => {				// back 서버로부터 응답받으면
+					console.log(res);		// back 서버에서 보낸 message 출력
+					this.previewText = res.data[0].sentence;
+			}).catch(err => console.log(err));
+			}
+				this.preview = true;
+
+			},
+			tempPreview() {
+				this.previewText = [
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "근데 아직도 이 한 달도 쎄지 웨이신 이음매 협사사번 이용을 안 애초에 장학금마을에 프라범 이화",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 243,
+							"end": 9093,
+							"senti": "None",
+							"sent_no": 1,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "뭐야",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 9213,
+							"end": 9543,
+							"senti": "None",
+							"sent_no": 1,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "2월 아는 추후에 뭐하러 웨스트 파업은",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 9573,
+							"end": 12903,
+							"senti": "None",
+							"sent_no": 2,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "좌우지",
+							"first_sentence": "true",
+							"quiet_time": 1,
+							"start": 13443,
+							"end": 13863,
+							"senti": "None",
+							"sent_no": 2,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "니 오디오 웹됐어요지 웨이신 아이 위멤버 월차임 뭐야 입선 땡방 주행에 최부 투잡으로 이어서 내가",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 13893,
+							"end": 25892,
+							"senti": "None",
+							"sent_no": 3,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "얘",
+							"first_sentence": "true",
+							"quiet_time": 1,
+							"start": 26762,
+							"end": 27152,
+							"senti": "None",
+							"sent_no": 3,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "기숙사",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 27182,
+							"end": 27902,
+							"senti": "None",
+							"sent_no": 4,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "아이",
+							"first_sentence": "true",
+							"quiet_time": 1,
+							"start": 28712,
+							"end": 28922,
+							"senti": "None",
+							"sent_no": 4,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "에이팀 임마",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 28952,
+							"end": 29792,
+							"senti": "None",
+							"sent_no": 5,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "아",
+							"first_sentence": "true",
+							"quiet_time": 1,
+							"start": 30722,
+							"end": 30962,
+							"senti": "None",
+							"sent_no": 5,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "백야 아웃백 회사 알고있으라 맹",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 30992,
+							"end": 32972,
+							"senti": "None",
+							"sent_no": 6,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "아예",
+							"first_sentence": "true",
+							"quiet_time": 1,
+							"start": 33872,
+							"end": 34292,
+							"senti": "None",
+							"sent_no": 6,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "섬 스위스 스테이유 은미 왜 와 있어 왜 9시에 OS 제일",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 34322,
+							"end": 42408,
+							"senti": "None",
+							"sent_no": 7,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "근데",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 42888,
+							"end": 43098,
+							"senti": "None",
+							"sent_no": 7,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "브랜드 빠 에스제이 심야 없",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 43158,
+							"end": 46908,
+							"senti": "None",
+							"sent_no": 8,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "으므로",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 47148,
+							"end": 47538,
+							"senti": "None",
+							"sent_no": 8,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "초에 임신 라인 유 에스",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 47688,
+							"end": 49368,
+							"senti": "None",
+							"sent_no": 9,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "에이래 예",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 49398,
+							"end": 51547,
+							"senti": "None",
+							"sent_no": 9,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "삼땡 드라이브 섬멸젝트에요",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 51577,
+							"end": 53437,
+							"senti": "None",
+							"sent_no": 10,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "아예",
+							"first_sentence": "true",
+							"quiet_time": 1,
+							"start": 54217,
+							"end": 54607,
+							"senti": "None",
+							"sent_no": 10,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "내 우선 결코 아이 에이치 음어디 스파이 스위스 안전하게 하라 했든 아예 하루 수렴할게",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 54637,
+							"end": 62921,
+							"senti": "None",
+							"sent_no": 11,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "아니다했어",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 63191,
+							"end": 63731,
+							"senti": "None",
+							"sent_no": 11,
+							"confidence": 0
+					},
+					{
+							"speaker": "1",
+							"name": "B",
+							"sentence": "웩스너이냐 헬스 미열 스타 매커얌 엔와이씨 아트 비유탕 아이메스 마이너스다 맥주만 사 프사 마이호우 말이 뭐지",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 63761,
+							"end": 73901,
+							"senti": "None",
+							"sent_no": 12,
+							"confidence": 0
+					},
+					{
+							"speaker": "0",
+							"name": "A",
+							"sentence": "집",
+							"first_sentence": "true",
+							"quiet_time": 0,
+							"start": 73931,
+							"end": 74321,
+							"senti": "None",
+							"sent_no": 12,
+							"confidence": 0
+					},
+				]
+				this.preview = true;
+			}
+    },
+}
+</script>
+
+<style lang="scss" scoped>
+.form-header{
+	padding: 70px 50px;
+	p {
+		margin: 0;
+		display: inline-block;
+	}
+}
+.form-contents {
+	width: 100%;
+	background-color: #f3f7ff;
+	display: flex;
+	justify-content: center;
+}
+.dragContainer {
+	min-height: 120px;
+	height: auto;
+}
+.emptyFileName {
+	height: 120px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.fileName {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.fileName span:nth-child(2) {
+	text-align: center;
+	padding: 5px 10px;
+	border-radius: 50%;
+}
+.fileName span:nth-child(2):hover {
+	cursor: pointer;
+	color: red;
+	background-color: rgba(255, 0, 0, 0.209);
+}
+.plainChip {
+	background: transparent !important;
+}
+.chip-overflow{
+	max-width: 95%;
+	padding: 2px 5px;
+}
+:v-deep(.v-chip__content) {
+	display: inline-block !important;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+:v-deep(.v-chip__close) {
+position: absolute;
+top: 5px;
+right: 0;
+width: 24px;
+}
+
+
+@media screen and (min-width: 768px) {
+.form-header{
+	p {
+		display: block;
+		text-align: center;
+	}
+}
+}
+</style>

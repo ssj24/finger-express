@@ -1,5 +1,5 @@
 <template>
-  <v-container class="d-flex flex-column align-center pt-15">
+  <v-card class="d-flex flex-column align-center pt-15">
     <v-row class="mb-4 main-row">
       <v-col cols="12" md="7" class="text-center text-md-start">
         <h2 class="subheading font-weight-regular mb-5">
@@ -11,7 +11,7 @@
           녹취록 작성 <br/>
         </h2>
         <p>
-          <span class="text-dot">녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
+          <span>녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
           <br />
           쉽고 빠르게!!!
           <br />
@@ -81,7 +81,7 @@
         </v-col>
       </v-row>
     </section>
-  </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -205,10 +205,6 @@ export default {
 <style lang="scss">
 .main-row {
   min-width: 60%;
-}
-.text-dot {
-  text-emphasis: dot;
-  text-emphasis-position: over;
 }
 .title-banner {
   // background-color: bisque;
