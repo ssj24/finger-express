@@ -1,6 +1,7 @@
 <template>
+<v-card v-if="showPreview" class="pa-5">
   <!-- 녹취록 -->
-  <v-row v-if="showPreview" class="flex-column">
+  <v-row class="flex-column">
     <v-card color="grey lighten-4" elevation="6" class="mx-auto mt-5" style="width: 800px; margin-bottom: 1px;">
       <v-card-text class="text-subtitle-1">
         원하시는 구간을 설정해주세요
@@ -68,13 +69,47 @@
         </div>
       </v-card-text>
     </v-card>
+    <!-- 하단 버튼 -->
+    <v-row class="d-flex justify-end">
+      <v-col class="d-flex justify-end pr-0">
+        <v-btn
+          plain
+          class="pa-0"
+          @click="reset"
+        >
+          <v-img
+            alt="reset"
+            class="shrink mr-2"
+            contain
+            src="../assets/undo-arrow.png"
+            transition="scale-transition"
+            width="20"
+          />
+        </v-btn>
+      </v-col>
+      <v-col cols="4" md="2">
+        <v-btn
+          width="100%"
+          :disabled="!valid"
+          color="accent"
+          class="mr-4"
+          @click="validate"
+        >
+          등록
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-row>
+
+</v-card>
 </template>
 
 <script>
 export default {
   name: 'sentencesComponent',
   props: {
+    valid: Boolean,
+    serverFileNameList: [],
     previewText: [],
     showPreview: Boolean,
   },
@@ -84,50 +119,77 @@ export default {
       checkbox: false,
     }
   },
+  watch: {
+    // selected(newVal) {
+    //   console.log('watch-selected', newVal);
+    // }
+  },
   methods: {
-			changeLabel(start, end, arr, empty=null) {
-				// let startLabelChip = document.querySelector(`label[for="previewCheck-${start}"]`).children[1];
-				// startLabelChip.classList.toggle('mdi-arrow-down-drop-circle-outline');
-				// startLabelChip.classList.toggle('mdi-arrow-right-drop-circle');
-				// startLabelChip.classList.toggle('primary--text');
-				// let endLabelChip = document.querySelector(`label[for="previewCheck-${end-1}"]`).children[1];
-				// endLabelChip.classList.toggle('mdi-arrow-down-drop-circle-outline');
-				// endLabelChip.classList.toggle('mdi-arrow-left-drop-circle');
-				// endLabelChip.classList.toggle('primary--text');
+    changeLabel(start, end, arr, empty=null) {
+      // let startLabelChip = document.querySelector(`label[for="previewCheck-${start}"]`).children[1];
+      // startLabelChip.classList.toggle('mdi-arrow-down-drop-circle-outline');
+      // startLabelChip.classList.toggle('mdi-arrow-right-drop-circle');
+      // startLabelChip.classList.toggle('primary--text');
+      // let endLabelChip = document.querySelector(`label[for="previewCheck-${end-1}"]`).children[1];
+      // endLabelChip.classList.toggle('mdi-arrow-down-drop-circle-outline');
+      // endLabelChip.classList.toggle('mdi-arrow-left-drop-circle');
+      // endLabelChip.classList.toggle('primary--text');
 
-				for (let i=1; i<arr.length; i++) {
-					let selectedLabelCard = document.querySelector(`label[for="previewCheck-${arr[i].value}"]`).children[0];
-					if (empty) {
-						selectedLabelCard.classList.remove("blue-grey");
-						selectedLabelCard.classList.remove("lighten-4");
-					} else if (start <= arr[i].value && arr[i].value < end) {
-						selectedLabelCard.classList.add("blue-grey");
-						selectedLabelCard.classList.add("lighten-4");
-					} else if (start <= arr[i].value && arr[i].value >= end) {
-						selectedLabelCard.classList.remove("blue-grey");
-						selectedLabelCard.classList.remove("lighten-4");
-					}
-				}
-			},
-			checkboxClicked() {
-				// let targetId = e.target.id;
-				// let targetVal = e.target.value;
-				// let targetLabel = document.getElementById(targetId).parentElement.querySelector(".previewLabel");
-				let previewCheckboxes = document.querySelectorAll('.previewCheckbox');
-				let previewCheckboxesArray = Array.from(previewCheckboxes);
-				if (!this.selected.length) {
-					this.changeLabel(0, previewCheckboxesArray.length, previewCheckboxesArray, true);
-				}
-				let sortedSelect = this.selected.sort(function(a, b){return a-b});
-				sortedSelect.forEach((x, i) => {
-					if(i % 2 == 1) {
-						this.changeLabel(sortedSelect[i-1], x, previewCheckboxesArray);
-					} else if (i == sortedSelect.length -1) {
-						console.log('last');
-						this.changeLabel(x, previewCheckboxesArray.length, previewCheckboxesArray);
-					}
-				});
-      },
+      for (let i=1; i<arr.length; i++) {
+        let selectedLabelCard = document.querySelector(`label[for="previewCheck-${arr[i].value}"]`).children[0];
+        if (empty) {
+          selectedLabelCard.classList.remove("blue-grey");
+          selectedLabelCard.classList.remove("lighten-4");
+        } else if (start <= arr[i].value && arr[i].value < end) {
+          selectedLabelCard.classList.add("blue-grey");
+          selectedLabelCard.classList.add("lighten-4");
+        } else if (start <= arr[i].value && arr[i].value >= end) {
+          selectedLabelCard.classList.remove("blue-grey");
+          selectedLabelCard.classList.remove("lighten-4");
+        }
+      }
+    },
+    checkboxClicked() {
+      // let targetId = e.target.id;
+      // let targetVal = e.target.value;
+      // let targetLabel = document.getElementById(targetId).parentElement.querySelector(".previewLabel");
+      let previewCheckboxes = document.querySelectorAll('.previewCheckbox');
+      let previewCheckboxesArray = Array.from(previewCheckboxes);
+      if (!this.selected.length) {
+        this.changeLabel(0, previewCheckboxesArray.length, previewCheckboxesArray, true);
+      }
+      let sortedSelect = this.selected.sort(function(a, b){return a-b});
+      sortedSelect.forEach((x, i) => {
+        if(i % 2 == 1) {
+          this.changeLabel(sortedSelect[i-1], x, previewCheckboxesArray);
+        } else if (i == sortedSelect.length -1) {
+          console.log('last');
+          this.changeLabel(x, previewCheckboxesArray.length, previewCheckboxesArray);
+        }
+      });
+    },
+    reset () {
+      this.$emit('resetClicked')
+    },
+    validate () {
+      const selectedData = [];
+      const scopeData = [];
+
+      for (let i = 1; i < this.selected.length; i += 2) {
+        console.log(i);
+        scopeData.push({ 'start_time': this.previewText[this.selected[i-1]].start, 'end_time': this.previewText[this.selected[i]-1].end});
+      }
+      if (this.selected.length % 2) {
+        // console.log(this.previewText[this.selected[this.selected.length-1]])
+        scopeData.push({ 'start_time': this.previewText[this.selected[this.selected.length-1]].start, 'end_time': this.previewText[this.previewText.length-1].end})
+      }
+      selectedData.push({
+        file_name: this.serverFileNameList[0],
+        stt_scope: scopeData
+      })
+      console.log(this.serverFileNameList);
+      this.$emit('validateClicked', selectedData)
+    },
   }
 }
 </script>
@@ -137,6 +199,9 @@ export default {
 	max-width: 800px;
 	max-height: 500px;
 	overflow: auto;
+}
+.previewLabelCard {
+  border: 1px solid red;
 }
 .font-class {
 	font-family: 'S-CoreDream-3Light',  sans-serif;

@@ -1,5 +1,5 @@
 <template>
-<div v-if="!mode" class="d-flex flex-column justify-center">
+<div v-if="mode === 2" class="d-flex flex-column justify-center">
 	<v-row class="form-header flex-column align-center justify-center">
 		<h1 class="mb-5">
 			녹취록 신청하기
@@ -10,8 +10,8 @@
 			<p>장바구니를 통하여 한번에 결재가 가능합니다.</p>
 		</div>
 	</v-row>
-	<v-row class="form-contents ma-0">
-		<v-col cols="11" md="9" class="d-flex flex-wrap">
+	<v-row class="form-contents py-16 flex-grow-1">
+		<v-col cols="11" md="9" class="d-flex flex-column">
 			<v-row>
 				<v-col cols="12" lg="4">
 					<v-card class="pa-5">
@@ -79,10 +79,18 @@
 										width="100%"
 										color="accent"
 										outlined
-										@click="tempPreview"
+										@click="showPreview"
 									>
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
+									</v-btn>
+									<v-btn
+										width="100%"
+										color="accent"
+										outlined
+										@click="tempPreview"
+									>
+										TEMP
 									</v-btn>
 								</v-col>
 							</v-row>
@@ -127,46 +135,15 @@
 			</v-row>
 			<v-row>
 				<v-col cols="12">
-					<v-card class="pa-5">
-						<Sentences :previewText="previewText" :showPreview="preview"/>
-						<!-- 하단 버튼 -->
-						<v-row class="d-flex justify-end">
-							<v-col class="d-flex justify-end pr-0">
-								<v-btn
-									plain
-									class="pa-0"
-									@click="reset"
-								>
-									<v-img
-										alt="reset"
-										class="shrink mr-2"
-										contain
-										src="../assets/undo-arrow.png"
-										transition="scale-transition"
-										width="20"
-									/>
-								</v-btn>
-							</v-col>
-							<v-col cols="4" md="2">
-								<v-btn
-									width="100%"
-									:disabled="!valid"
-									color="accent"
-									class="mr-4"
-									@click="validate"
-								>
-									등록
-								</v-btn>
-							</v-col>
-						</v-row>
-					</v-card>
+					<Sentences :valid="valid" :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @resetClicked="reset" @validateClicked="validate"/>
+
 				</v-col>
 			</v-row>
 		</v-col>
 	</v-row>
 	
 </div>
-<Payment v-else :formData="formData" :files="files" class="d-flex align-center justify-center my-12" />
+<Payment v-else-if="mode === 3" :formData="formData" :files="files" class="d-flex align-center justify-center my-12" />
 </template>
 
 <script>
@@ -181,110 +158,15 @@ export default {
 			Sentences,
     },
 		props: {
-			mode: Boolean,
+			mode: Number,
 		},
     data: () => {
 			let previewText = [
-				// {
-				// 	"speaker": speaker, 
-				// 	"name": chr(ord(speaker) + 17), 
-				// 	"sentence": cur_text, 
-				// 	"first_sentence": "false",
-				// 	"quiet_time": 0, 
-				// 	"start": start_time, 
-				// 	"end": end_time, 
-				// 	"senti": "None", 
-				// 	"sent_no": 0,
-				// 	"sent_sub": 0, 
-				// 	"confidence": sent_confidence
-				// },
 				{},
-				{
-					"start": "0001",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 0
-				},
-				{
-					"start": "0005",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 1
-				},
-				{
-					"start": "0007",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "zzz2",
-					"sent_no": 2
-				},
-				{
-					"start": "0009",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 3
-				},
-				{
-					"start": "0012",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "zzz2",
-					"sent_no": 4
-				},
-				{
-					"start": "0014",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 5
-				},
-				{
-					"start": "0017",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 6
-				},
-				{
-					"start": "0019",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "zzz2",
-					"sent_no": 7
-				},
-				{
-					"start": "0021",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 8
-				},
-				{
-					"start": "0022",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "zzz2",
-					"sent_no": 9
-				},
-				{
-					"start": "0023",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "333",
-					"sent_no": 10
-				},
-				{
-					"start": "0025",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "zzz2",
-					"sent_no": 11
-				},
-				{
-					"start": "0026",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "abc1",
-					"sent_no": 12
-				},
-				{
-					"start": "0030",
-					"sentence": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro accusantium ullam corporis veritatis? Maxime aspernatur repudiandae sunt iure corrupti vel voluptates autem ducimus facere exercitationem alias, aperiam eos voluptatem optio.",
-					"name": "333",
-					"sent_no": 13
-				},
 			];
+			let clientMail = 'client@test.com';
 			return {
+				clientMail,
 				valid: true,
 				delivery: 1,
 				authentication: false,
@@ -292,62 +174,50 @@ export default {
 				fileRules: [
 					v => !!v || '파일을 등록해주세요'
 				],
+				serverFileNameList: [],
 				preview: false,
 				previewText,
 				isComplete: false,
 				formData: {},
 			}
     },
-		watch: {
-			selected(newVal) {
-				console.log('watch-selected', newVal);
-			}
-    },
     methods: {
-      validate () {
-        if (this.files.length) {
-					const date = new Date();
-					this.formData = {
-						message: 'stt_analysis',
-						client_mail:'client@test.com',
-						stt_engine:'review',
-						time_info: `${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`,
-						files: this.files
-					}
-					console.log(this.formData);
-					// const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
-					// 	if (Array.isArray(val)) {
-					// 		val.forEach(v => fd.append(key, v))
-					// 	} else {
-					// 		fd.append(key, val)
-					// 	}
-					// 	return fd
-					// }, new FormData());
-					// console.log(getFormData(this.formData));
-					axios({					// axios 통신 시작
-          url: "/rest",	// back 서버 주소
-          method: "POST",
-					data: this.formData,
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
-        }).then(res => {				// back 서버로부터 응답받으면
-            console.log(res);		// back 서버에서 보낸 message 출력
-						this.previewText = res.data[0].sentence;
-        }).catch(err => console.log(err));
-				}
+			getTimeFormat() {
+				function pad(n) { return n<10 ? "0"+n : n }
+					const d=new Date()
+					return `${d.getFullYear()}`.concat(pad(d.getMonth()+1), pad(d.getDate()), pad(d.getDate()), pad(d.getHours()), pad(d.getMinutes()), pad(d.getSeconds()));
+			},
+      validate (val) {
+				console.log(val);
+        // if (this.files.length) {
+				// 	this.formData = {
+				// 		message: 'stt_scope',
+				// 		client_mail: this.clientMail,
+				// 		scope_files: val,
+				// 	}
+				// 	console.log(this.formData);
+				// 	// const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
+				// 	// 	if (Array.isArray(val)) {
+				// 	// 		val.forEach(v => fd.append(key, v))
+				// 	// 	} else {
+				// 	// 		fd.append(key, val)
+				// 	// 	}
+				// 	// 	return fd
+				// 	// }, new FormData());
+				// 	// console.log(getFormData(this.formData));
 
-				// this.formData = {
-				// 	name: this.name || '',
-				// 	password: this.password || '',
-				// 	phone: this.phone || '',
-				// 	email: this.email || '',
-				// 	postcode: this.postcode || '',
-				// 	address: this.address + this.extraAddress || '',
-				// 	delivery: this.select || '',
-				// 	file: this.file
+				// 	axios({					// axios 통신 시작
+        //   url: "/scope/",	// back 서버 주소
+        //   method: "POST",
+				// 	data: this.formData,
+				// 	headers: {
+				// 		'Content-Type': 'application/json'
+				// 	}
+        // }).then(res => {				// back 서버로부터 응답받으면
+        //     console.log(res);		// back 서버에서 보낸 message 출력
+        // }).catch(err => console.log(err));
 				// }
-				this.isComplete = true;
+				// this.isComplete = true;
 				// this.$emit('changeMode', true);
       },
       reset () {
@@ -394,26 +264,26 @@ export default {
 			},
 			showPreview() {
 				if (this.files.length) {
-				const date = new Date();
+				const timeFormat = this.getTimeFormat();
 				this.formData = {
 					message: 'stt_analysis',
-					client_mail:'client@test.com',
+					client_mail: this.clientMail,
 					stt_engine:'review',
-					time_info: `${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`,
+					time_info: timeFormat,
 					files: this.files
 				}
-				console.log(this.formData);
-				const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
-					if (Array.isArray(val)) {
-						val.forEach(v => fd.append(key, v))
-					} else {
-						fd.append(key, val)
-					}
-					return fd
-				}, new FormData());
-				console.log(getFormData(this.formData));
+				// console.log(this.formData);
+				// const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
+				// 	if (Array.isArray(val)) {
+				// 		val.forEach(v => fd.append(key, v))
+				// 	} else {
+				// 		fd.append(key, val)
+				// 	}
+				// 	return fd
+				// }, new FormData());
+				// console.log(getFormData(this.formData));
 				axios({					// axios 통신 시작
-				url: "/rest",	// back 서버 주소
+				url: "/rest/",	// back 서버 주소
 				method: "POST",
 				data: this.formData,
 				headers: {
@@ -421,14 +291,17 @@ export default {
 				}
 			}).then(res => {				// back 서버로부터 응답받으면
 					console.log(res);		// back 서버에서 보낸 message 출력
-					this.previewText = res.data[0].sentence;
+					this.previewText.push(...res.data[0].sentence);
+					this.serverFileNameList.push(res.data[0].file_name);
+					console.log(this.previewText);
+					this.preview = true;
 			}).catch(err => console.log(err));
 			}
-				this.preview = true;
 
 			},
 			tempPreview() {
-				this.previewText = [
+				
+				const previewList = [
 					{
 							"speaker": "1",
 							"name": "B",
@@ -717,7 +590,10 @@ export default {
 							"sent_no": 12,
 							"confidence": 0
 					},
-				]
+				];
+				this.previewText.push(...previewList);
+				this.serverFileNameList.push('temp_file_name');
+				console.log(this.previewText);
 				this.preview = true;
 			}
     },
