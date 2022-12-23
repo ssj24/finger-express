@@ -11,12 +11,18 @@ module.exports = defineConfig({
         target: 'http://192.168.31.35:8000',
         changeOrigin: true,
       },
-      '^/hhh': {
-        target: 'https://componer.iptime.org/test',
+      '^/rest/': {
+        target: 'https://rest.finger.solutions/api/ReviewStt/',
         changeOrigin: true,
         secure: false,
-        pathRewrite: {'^/hhh' : ''}
+        pathRewrite: {'^/rest' : ''}
       },
+      '^/scope': {
+        target: 'https://rest.finger.solutions/api/SttScope/',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {'^/scope' : ''}
+      },  
       '^/stt': {
         target: 'https://componer.iptime.org/SttAnalysis/',
         changeOrigin: true,

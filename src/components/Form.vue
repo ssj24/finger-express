@@ -1,278 +1,264 @@
 <template>
-<div v-if="!mode" class="d-flex flex-column align-center justify-center">
-	<v-col cols="11" md="8" lg="6">
-		<v-form
-			ref="form"
-			v-model="valid"
-			lazy-validation
-			class="my-10"
+  				<v-form
+					ref="form"
+					v-model="valid"
+					lazy-validation
+					class="my-10"
 
-		>
-			<v-text-field
-				v-model="name"
-				:counter="10"
-				:rules="nameRules"
-				label="이름"
-				required
-			></v-text-field>
+				>
+					<v-text-field
+						v-model="name"
+						:counter="10"
+						:rules="nameRules"
+						label="이름"
+						required
+					></v-text-field>
 
-			<v-text-field
-				v-model="password"
-				:append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-				:rules="passwordRules"
-				:type="show ? 'text' : 'password'"
-				label="비밀번호"
-				hint="8자 이상 입력해주세요"
-				counter
-				@click:append="show = !show"
-			></v-text-field>
+					<v-text-field
+						v-model="password"
+						:append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+						:rules="passwordRules"
+						:type="show ? 'text' : 'password'"
+						label="비밀번호"
+						hint="8자 이상 입력해주세요"
+						counter
+						@click:append="show = !show"
+					></v-text-field>
 
-			<v-text-field
-				v-model="phone"
-				:rules="phoneRules"
-				type="tel"
-				label="휴대폰 번호"
-				hint="01x-xxxx-xxxx"
-				required
-			></v-text-field>
+					<v-text-field
+						v-model="phone"
+						:rules="phoneRules"
+						type="tel"
+						label="휴대폰 번호"
+						hint="01x-xxxx-xxxx"
+						required
+					></v-text-field>
 
-			<v-text-field
-				v-model="email"
-				:rules="emailRules"
-				label="이메일"
-				required
-			></v-text-field>
+					<v-text-field
+						v-model="email"
+						:rules="emailRules"
+						label="이메일"
+						required
+					></v-text-field>
 
 
-			<v-select
-				v-model="select"
-				:items="delivery"
-				:rules="[v => !!v || '하나를 선택해주세요']"
-				label="배송 방식"
-				required
-			></v-select>
-			<!-- 주소 -->
-			<v-row v-if="select === '등기'">
-				<v-col cols="9" md="10">
-					<v-row>
-						<v-col cols="4" md="3">
+					<v-select
+						v-model="select"
+						:items="delivery"
+						:rules="[v => !!v || '하나를 선택해주세요']"
+						label="배송 방식"
+						required
+					></v-select>
+					<!-- 주소 -->
+					<v-row v-if="select === '등기'">
+						<v-col cols="9" md="10">
+							<v-row>
+								<v-col cols="4" md="3">
+									<v-text-field
+										v-model="postcode"
+										label="우편번호"
+									></v-text-field>
+								</v-col>
+								<v-col>
+									<v-text-field
+										v-model="address"
+										label="주소"
+									></v-text-field>
+								</v-col>
+							</v-row>
 							<v-text-field
-								v-model="postcode"
-								label="우편번호"
+								v-model="extraAddress"
+								label="상세주소"
 							></v-text-field>
 						</v-col>
-						<v-col>
-							<v-text-field
-								v-model="address"
-								label="주소"
-							></v-text-field>
+						<v-col cols="3" md="2" class="d-flex justify-center align-center">
+							<v-btn
+								width="100%"
+								color="accent"
+								outlined
+								@click="execDaumPostcode"
+							>찾기</v-btn>
 						</v-col>
 					</v-row>
-					<v-text-field
-						v-model="extraAddress"
-						label="상세주소"
-					></v-text-field>
-				</v-col>
-				<v-col cols="3" md="2" class="d-flex justify-center align-center">
-					<v-btn
-						width="100%"
-						color="accent"
-						outlined
-						@click="execDaumPostcode"
-					>찾기</v-btn>
-				</v-col>
-			</v-row>
 
-			<!-- 파일 업로드 -->
-			<v-row class="pa-0">
-				<v-col cols="8" md="10"
-				>
-				<v-file-input
-					v-model="files"
-					color="orange accent-4"
-					class="pa-0"
-					counter
-					multiple
-					label="파일 업로드"
-					accept="audio/*, video/*"
-					@change="uploadHandler"
-					placeholder="음성 파일을 선택해주세요"
-					:rules="fileRules"
-					id="fileInput"
-				>
-				</v-file-input>
-				</v-col>
-				<v-col cols="4" md="2" class="d-flex justify-center align-center mb-4">
-					<v-btn
-						width="100%"
-						color="accent"
-						outlined
-						@click="showPreview"
-						:disabled="files.length ? true : false"
-					>
-						미리보기
-					</v-btn>
-				</v-col>
-			</v-row>
-			<v-row>
-				<v-col cols="12"
-					@dragover.prevent
-					@drop.prevent
-					class="pt-0"
-				>
-					<!-- <audio id="audio-preview" controls v-show="file != ''"/> -->
-					<v-card @drop="dragFile" class="pa-5 dragContainer">
-						<span v-if="!files.length" class="emptyFileName">
-							<v-icon left>
-								mdi-music-note-plus
-							</v-icon>
-							파일을 드래그해서 추가해주세요
-						</span>
-						<span v-else v-for="(f, i) in files" :key="i" class="fileName">
-							<span>
-								<div class="text-subtitle-2">{{f.sizeInMB}}MB</div>
-								<p class="text-subtitle-1 text--primary">
-									{{ f.name }}
-								</p>
-							</span>
-							<span @click="deleteF(i)">X</span>
-							<!-- <v-chip
+					<!-- 파일 업로드 -->
+					<v-row class="pa-0">
+						<v-col cols="8" md="10"
+						>
+						<v-file-input
+							v-model="files"
+							color="orange accent-4"
+							class="pa-0"
+							counter
+							multiple
+							label="파일 업로드"
+							accept="audio/*, video/*"
+							@change="uploadHandler"
+							placeholder="음성 파일을 선택해주세요"
+							:rules="fileRules"
+							id="fileInput"
+						>
+						</v-file-input>
+						</v-col>
+						<v-col cols="4" md="2" class="d-flex justify-center align-center mb-4">
+							<v-btn
+								width="100%"
 								color="accent"
-								class="col-11 chip-overflow"
-								style="line-height: 100%;"
-								label
+								outlined
+								@click="showPreview"
+								:disabled="files.length ? true : false"
 							>
-								{{ f.name }}
-							</v-chip> -->
-						</span>
-					</v-card>
-				</v-col>
-			</v-row>
-			<!-- 녹취록 -->
-			<v-row v-if="preview">
-				<v-card color="grey lighten-4" elevation="6" class="mx-auto mt-5" style="width: 800px; margin-bottom: 1px;">
-					<v-card-text class="text-subtitle-1">
-						원하시는 구간을 설정해주세요
-					</v-card-text>
-				</v-card>
-				<v-card
-					class="mx-auto mt-0 mb-5 previewContainer"
-					max-width="800"
-					max-height="500"
-				>
-					<v-card-text>
-						<h2 class="text--primary font-class my-8">
-							녹취록 미리보기
-						</h2>
-						<div class="text--primary" id="previewCheckboxes" v-for="(text, i) in previewText" :key="i" max-height="600px">
-							<input
-								type="checkbox"
-								v-model="selected"
-								:value=i
-								class="previewCheckbox"
-								:id="'previewCheck-'+i"
-								@change="checkboxClicked"
-							/>
-							<label :for="'previewCheck-'+i" class="previewLabel">
-								<v-card v-if="i==0" class="disabledLabel mt-5">
-									<v-card-subtitle>전체 선택하기</v-card-subtitle>
-								</v-card>
-								<v-card v-else class="px-5 previewLabelCard my-5" shaped>
-										<v-card-subtitle>
-											<v-row>
-												<v-chip
-													:ripple="false"
-													class="ma-2"
-													color="primary"
-													label
-													outlined
-												>
-													<v-icon left>
-														mdi-clock
-													</v-icon>
-													{{text.start}}
-												</v-chip>
-												<v-chip
-													class="my-2 plainChip"
-													color="grey--darken-4"
-													label
-												>
-													<v-icon left>
-														mdi-account-circle-outline
-													</v-icon>
-													{{text.name}}
-												</v-chip>
-											</v-row>
-										</v-card-subtitle>
-										<v-row>
-											<v-col>
-												<p class="">{{text.sentence}}</p>
-											</v-col>
-										</v-row>
-								</v-card>
-								<!-- <v-icon>
-									mdi-arrow-down-drop-circle-outline
-								</v-icon> -->
-							</label>
-						</div>
-					</v-card-text>
-				</v-card>
-			</v-row>
-			<!-- <v-checkbox
-				v-model="checkbox"
-				:rules="[v => !!v || '동의하지 않으시면 다음 단계로 넘어갈 수 없습니다']"
-				label="이용약관"
-				required
-			></v-checkbox> -->
-			<!-- 하단 버튼 -->
-			<v-row class="d-flex justify-end">
-				<v-col class="d-flex justify-end pr-0">
-					<v-btn
-						plain
-						class="pa-0"
-						@click="reset"
-					>
-						<v-img
-							alt="reset"
-							class="shrink mr-2"
-							contain
-							src="../assets/undo-arrow.png"
-							transition="scale-transition"
-							width="20"
-						/>
-					</v-btn>
-				</v-col>
-				<v-col cols="4" md="2">
-					<v-btn
-						width="100%"
-						:disabled="!valid"
-						color="accent"
-						class="mr-4"
-						@click="validate"
-					>
-						등록
-					</v-btn>
-				</v-col>
-			</v-row>
-		</v-form>
-	</v-col>
-</div>
-<Payment v-else :formData="formData" :files="files" class="d-flex align-center justify-center my-12" />
+								미리보기
+							</v-btn>
+						</v-col>
+					</v-row>
+					<v-row>
+						<v-col cols="12"
+							@dragover.prevent
+							@drop.prevent
+							class="pt-0"
+						>
+							<!-- <audio id="audio-preview" controls v-show="file != ''"/> -->
+							<v-card @drop="dragFile" class="pa-5 dragContainer">
+								<span v-if="!files.length" class="emptyFileName">
+									<v-icon left>
+										mdi-music-note-plus
+									</v-icon>
+									파일을 드래그해서 추가해주세요
+								</span>
+								<span v-else v-for="(f, i) in files" :key="i" class="fileName">
+									<span>
+										<div class="text-subtitle-2">{{f.sizeInMB}}MB</div>
+										<p class="text-subtitle-1 text--primary">
+											{{ f.name }}
+										</p>
+									</span>
+									<span @click="deleteF(i)">X</span>
+									<!-- <v-chip
+										color="accent"
+										class="col-11 chip-overflow"
+										style="line-height: 100%;"
+										label
+									>
+										{{ f.name }}
+									</v-chip> -->
+								</span>
+							</v-card>
+						</v-col>
+					</v-row>
+					<!-- 녹취록 -->
+					<v-row v-if="preview">
+						<v-card color="grey lighten-4" elevation="6" class="mx-auto mt-5" style="width: 800px; margin-bottom: 1px;">
+							<v-card-text class="text-subtitle-1">
+								원하시는 구간을 설정해주세요
+							</v-card-text>
+						</v-card>
+						<v-card
+							class="mx-auto mt-0 mb-5 previewContainer"
+							max-width="800"
+							max-height="500"
+						>
+							<v-card-text>
+								<h2 class="text--primary font-class my-8">
+									녹취록 미리보기
+								</h2>
+								<div class="text--primary" id="previewCheckboxes" v-for="(text, i) in previewText" :key="i" max-height="600px">
+									<input
+										type="checkbox"
+										v-model="selected"
+										:value=i
+										class="previewCheckbox"
+										:id="'previewCheck-'+i"
+										@change="checkboxClicked"
+									/>
+									<label :for="'previewCheck-'+i" class="previewLabel">
+										<v-card v-if="i==0" class="disabledLabel mt-5">
+											<v-card-subtitle>전체 선택하기</v-card-subtitle>
+										</v-card>
+										<v-card v-else class="px-5 previewLabelCard my-5" shaped>
+												<v-card-subtitle>
+													<v-row>
+														<v-chip
+															:ripple="false"
+															class="ma-2"
+															color="primary"
+															label
+															outlined
+														>
+															<v-icon left>
+																mdi-clock
+															</v-icon>
+															{{text.start}}
+														</v-chip>
+														<v-chip
+															class="my-2 plainChip"
+															color="grey--darken-4"
+															label
+														>
+															<v-icon left>
+																mdi-account-circle-outline
+															</v-icon>
+															{{text.name}}
+														</v-chip>
+													</v-row>
+												</v-card-subtitle>
+												<v-row>
+													<v-col>
+														<p class="">{{text.sentence}}</p>
+													</v-col>
+												</v-row>
+										</v-card>
+										<!-- <v-icon>
+											mdi-arrow-down-drop-circle-outline
+										</v-icon> -->
+									</label>
+								</div>
+							</v-card-text>
+						</v-card>
+					</v-row>
+					<!-- <v-checkbox
+						v-model="checkbox"
+						:rules="[v => !!v || '동의하지 않으시면 다음 단계로 넘어갈 수 없습니다']"
+						label="이용약관"
+						required
+					></v-checkbox> -->
+					<!-- 하단 버튼 -->
+					<v-row class="d-flex justify-end">
+						<v-col class="d-flex justify-end pr-0">
+							<v-btn
+								plain
+								class="pa-0"
+								@click="reset"
+							>
+								<v-img
+									alt="reset"
+									class="shrink mr-2"
+									contain
+									src="../assets/undo-arrow.png"
+									transition="scale-transition"
+									width="20"
+								/>
+							</v-btn>
+						</v-col>
+						<v-col cols="4" md="2">
+							<v-btn
+								width="100%"
+								:disabled="!valid"
+								color="accent"
+								class="mr-4"
+								@click="validate"
+							>
+								등록
+							</v-btn>
+						</v-col>
+					</v-row>
+				</v-form>
 </template>
 
 <script>
-import Payment from './Payment.vue';
-import axios from 'axios';
-
 export default {
-    name: 'applicationForm',
-    components: {
-      Payment
-    },
-		props: {
-			mode: Boolean,
-		},
-    data: () => {
+  name: 'formComponent',
+  data: () => {
 			let previewText = [
 				// {
 				// 	"speaker": speaker, 
@@ -599,6 +585,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.form-header{
+	padding: 70px 50px;
+	p {
+		margin: 0;
+		display: inline-block;
+	}
+}
+.form-contents {
+	width: 100%;
+	background-color: #f3f7ff;
+	display: flex;
+	justify-content: center;
+}
 .dragContainer {
 	min-height: 120px;
 	height: auto;
@@ -670,5 +669,13 @@ label:hover {
 }
 .disabledLabel {
 	pointer-events: none;
+}
+@media screen and (min-width: 768px) {
+.form-header{
+	p {
+		display: block;
+		text-align: center;
+	}
+}
 }
 </style>

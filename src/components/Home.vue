@@ -1,7 +1,7 @@
 <template>
-  <v-container class="d-flex flex-column align-center pt-15">
-    <v-row class="mb-4 main-row">
-      <v-col cols="12" md="7" class="text-center text-md-start">
+  <v-card class="d-flex flex-column align-center">
+    <v-row class="mb-4 main-row white--text">
+      <v-col cols="12" class="text-center">
         <h2 class="subheading font-weight-regular mb-5">
           <!-- 온라인 속기 서비스 <br/>
           증거제출 <br/>
@@ -10,8 +10,8 @@
           증거제출 
           녹취록 작성 <br/>
         </h2>
-        <p>
-          <span class="text-dot">녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
+        <!-- <p>
+          <span>녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
           <br />
           쉽고 빠르게!!!
           <br />
@@ -19,10 +19,25 @@
           <br />다수의 작성 경험과 정확도를 가지고
           <br />
           온라인 최저가격으로 제공합니다.
-        </p>
-        
+        </p> -->
+      <h1 class="display-2 font-weight-bold mb-7 py-5 text-center text-uppercase title-banner">
+        Finger Express
+      </h1>
+      <v-row>
+        <v-col
+          class="mb-5 d-flex justify-center"
+          cols="12"
+        >
+          <v-btn
+            x-large
+            width="200px"
+            color="accent"
+            @click="clicked"
+          >신청하기</v-btn>
+        </v-col>
+      </v-row>
       </v-col>
-      <v-col cols="12" md="5" class="d-flex flex-column justify-center align-center" data-aos="zoom-out" data-aos-duration="3000">
+      <!-- <v-col cols="12" md="5" class="d-flex flex-column justify-center align-center" data-aos="zoom-out" data-aos-duration="3000">
         <v-img
           src="../assets/thunderBig.png"
           class="shrink"
@@ -30,25 +45,10 @@
           width="200px"
           height="200px"
         />
-      </v-col>
+      </v-col> -->
+
     </v-row>
-    <h1 class="display-2 font-weight-bold mb-7 py-5 text-center text-uppercase title-banner">
-      Finger Express
-    </h1>
-    <v-row>
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-      <button @click="testReq">test</button>
-        <v-btn
-          x-large
-          width="200px"
-          color="accent"
-          @click="clicked"
-        >신청하기</v-btn>
-      </v-col>
-    </v-row>
+    
     <!-- components -->
     <Process data-aos="fade-up" data-aos-anchor-placement="top-bottom" />
     <Price data-aos="fade-up" data-aos-anchor-placement="center-bottom" />
@@ -81,7 +81,7 @@
         </v-col>
       </v-row>
     </section>
-  </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -89,12 +89,10 @@ import Process from './Process';
 import Review from './Review';
 import Price from './Price';
 
-import axios from 'axios';
-
 export default {
   name: 'LandingHome',
   props: {
-    applicationForm: Boolean,
+    mode: Number,
   },
   components: {
     Process,
@@ -183,32 +181,16 @@ export default {
   }),
   methods: {
     clicked() {
-      this.$emit('clicked', true);
+      this.$emit('clicked', 2);
     },
-    testReq() {
-      axios({					// axios 통신 시작
-        url: "/hhh",	// back 서버 주소
-        method: "GET",
-        // data: data,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(res => {				// back 서버로부터 응답받으면
-        console.log(res);		// back 서버에서 보낸 message 출력
-      })
-      .catch(err => console.log(err));
-    }
   }
 }
 </script>
 <style lang="scss">
 .main-row {
-  min-width: 60%;
-}
-.text-dot {
-  text-emphasis: dot;
-  text-emphasis-position: over;
+  padding: 30px 0;
+  width: 100%;
+  background-color: navy;
 }
 .title-banner {
   // background-color: bisque;
