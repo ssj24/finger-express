@@ -33,11 +33,15 @@
       <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(2)">신청하기</v-btn>
       <!-- <v-btn class="white--text font-weight mr-2" outlined >장바구니</v-btn> -->
       <v-btn class="white--text font-weight mr-2" outlined v-if="this.$store.state.isLogin">마이페이지</v-btn>
+      <v-btn class="white--text font-weight mr-2" outlined @click="toAdminComponent">관리자</v-btn>
       <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn>
       <v-btn class="white--text font-weight mr-2" outlined @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
     </v-app-bar>
 
-    <v-main class="d-flex justify-center align-center" v-if="!toSignIn">
+    <v-main class="d-flex justify-center align-center" v-if="toAdmin">
+      <Admin :toAdmin="toAdmin" />
+    </v-main>
+    <v-main class="d-flex justify-center align-center" v-else-if="!toSignIn">
       <Home
         v-if="mode === 1"
         :mode="mode"
@@ -49,7 +53,7 @@
         @changeMode="modeChanged"
         />
     </v-main>
-    <v-main class="d-flex justify-center align-center" v-else>
+    <v-main class="d-flex justify-center align-center" v-else-if="toSignIn">
       <Sign-up />
     </v-main>
     <Footer />
@@ -57,6 +61,7 @@
 </template>
 
 <script>
+import Admin from './components/Admin.vue';
 import Home from './components/Home.vue';
 import Application from './components/Application.vue';
 import SignUp from './components/Signup.vue';
@@ -66,6 +71,7 @@ export default {
   name: 'App',
 
   components: {
+    Admin,
     Home,
     Application,
     SignUp,
@@ -73,6 +79,7 @@ export default {
   },
   data: () => ({
     applicationForm: false,
+    toAdmin: false,
     toSignIn: false,
     mode: 1,
   }),
@@ -99,6 +106,11 @@ export default {
         if (val) this.checkHistory = false;
         this.changeAppBarColor(false);
       }
+    },
+    toAdminComponent() {
+      this.changeAppBarColor(false);
+      this.toAdmin = true;
+
     },
     signIn() {
       this.toSignIn = true;

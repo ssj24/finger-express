@@ -189,36 +189,39 @@ export default {
 			},
       validate (val) {
 				console.log(val);
-        // if (this.files.length) {
-				// 	this.formData = {
-				// 		message: 'stt_scope',
-				// 		client_mail: this.clientMail,
-				// 		scope_files: val,
-				// 	}
-				// 	console.log(this.formData);
-				// 	// const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
-				// 	// 	if (Array.isArray(val)) {
-				// 	// 		val.forEach(v => fd.append(key, v))
-				// 	// 	} else {
-				// 	// 		fd.append(key, val)
-				// 	// 	}
-				// 	// 	return fd
-				// 	// }, new FormData());
-				// 	// console.log(getFormData(this.formData));
+        if (this.files.length) {
+					this.formData = {
+						message: 'stt_scope',
+						client_mail: this.clientMail,
+						scope_files: val,
+					}
+					console.log(this.formData);
+					// const getFormData = object => Object.entries(object).reduce((fd, [ key, val ]) => {
+					// 	if (Array.isArray(val)) {
+					// 		val.forEach(v => fd.append(key, v))
+					// 	} else {
+					// 		fd.append(key, val)
+					// 	}
+					// 	return fd
+					// }, new FormData());
+					// console.log(getFormData(this.formData));
 
-				// 	axios({					// axios 통신 시작
-        //   url: "/scope/",	// back 서버 주소
-        //   method: "POST",
-				// 	data: this.formData,
-				// 	headers: {
-				// 		'Content-Type': 'application/json'
-				// 	}
-        // }).then(res => {				// back 서버로부터 응답받으면
-        //     console.log(res);		// back 서버에서 보낸 message 출력
-        // }).catch(err => console.log(err));
-				// }
-				// this.isComplete = true;
-				// this.$emit('changeMode', true);
+					axios({					// axios 통신 시작
+          url: "/scope/",	// back 서버 주소
+          method: "POST",
+					data: this.formData,
+					headers: {
+						'Content-Type': 'application/json'
+					}
+        }).then(res => {				// back 서버로부터 응답받으면
+            console.log(res);		// back 서버에서 보낸 message 출력
+						if (res.statusText === 'OK') {
+
+							this.isComplete = true;
+							this.$emit('changeMode', true);
+						}
+        }).catch(err => console.log(err));
+				}
       },
       reset () {
         this.$refs.form.reset();

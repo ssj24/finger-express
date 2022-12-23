@@ -2,70 +2,77 @@
 <v-card v-if="showPreview" class="pa-5">
   <!-- 녹취록 -->
   <v-row class="flex-column">
-    <v-card color="grey lighten-4" elevation="6" class="mx-auto mt-5" style="width: 800px; margin-bottom: 1px;">
-      <v-card-text class="text-subtitle-1">
-        원하시는 구간을 설정해주세요
-      </v-card-text>
-    </v-card>
     <v-card
       class="mx-auto mt-0 mb-5 previewContainer"
       max-width="800"
       max-height="500"
     >
       <v-card-text>
-        <h2 class="text--primary font-class my-8">
-          녹취록 미리보기
-        </h2>
-        <div class="text--primary" id="previewCheckboxes" v-for="(text, i) in previewText" :key="i" max-height="600px">
-          <input
-            type="checkbox"
-            v-model="selected"
-            :value=i
-            class="previewCheckbox"
-            :id="'previewCheck-'+i"
-            @change="checkboxClicked"
-          />
+        <v-row class="justify-space-between align-center">
+          <v-col>
+            <h2 class="text--primary text-left font-class my-2">
+              녹취록 미리보기
+            </h2>
+            <p>원하는 구간을 선택해주세요.</p>
+          </v-col>
+          <p>
+            총 길이: {{this.previewText[this.previewText.length-1].end}} |
+            선택 길이: {{this.previewText.length}}
+          </p>
+        </v-row>
+        <div class="text--primary previewCheckboxes" :id="'previewCheckboxes-'+i" v-for="(text, i) in previewText" :key="i">
           <label :for="'previewCheck-'+i" class="previewLabel">
-            <v-card v-if="i==0" class="disabledLabel mt-5">
+            <div v-if="i==0" class="disabledLabel mt-5">
               <v-card-subtitle>전체 선택하기</v-card-subtitle>
-            </v-card>
-            <v-card v-else class="px-5 previewLabelCard my-5" shaped>
-                <v-card-subtitle>
-                  <v-row>
-                    <v-chip
-                      :ripple="false"
-                      class="ma-2"
-                      color="primary"
-                      label
-                      outlined
-                    >
-                      <v-icon left>
-                        mdi-clock
-                      </v-icon>
-                      {{text.start}}
-                    </v-chip>
-                    <v-chip
-                      class="my-2 plainChip"
-                      color="grey--darken-4"
-                      label
-                    >
-                      <v-icon left>
-                        mdi-account-circle-outline
-                      </v-icon>
-                      {{text.name}}
-                    </v-chip>
-                  </v-row>
-                </v-card-subtitle>
+            </div>
+            <div v-else class="px-5 previewLabelCard my-5">
+              <v-card-subtitle>
                 <v-row>
-                  <v-col>
-                    <p class="">{{text.sentence}}</p>
-                  </v-col>
+                  <v-chip
+                    :ripple="false"
+                    class="ma-2"
+                    color="blue"
+                    label
+                    outlined
+                  >
+                    <v-icon left>
+                      mdi-clock
+                    </v-icon>
+                    {{text.start}}
+                  </v-chip>
+                  <v-chip
+                    class="my-2 plainChip"
+                    color="grey--darken-4"
+                    label
+                    plain
+                  >
+                    <v-icon left>
+                      mdi-account-circle-outline
+                    </v-icon>
+                    {{text.name}}
+                  </v-chip>
                 </v-row>
-            </v-card>
-            <!-- <v-icon>
-              mdi-arrow-down-drop-circle-outline
-            </v-icon> -->
+              </v-card-subtitle>
+              <v-row>
+                <v-col>
+                  <p class="">{{text.sentence}}</p>
+                </v-col>
+              </v-row>
+            </div>
           </label>
+          <div class="checkboxWrapper">
+            <input
+              type="checkbox"
+              v-model="selected"
+              :value=i
+              class="previewCheckbox"
+              :id="'previewCheck-'+i"
+              @click="onCheckboxClicked"
+              @change="checkboxClicked"
+            />
+            <span class="mdi mdi-24px mdi-check-circle"></span>
+
+          </div>
         </div>
       </v-card-text>
     </v-card>
@@ -116,6 +123,7 @@ export default {
   data: () => {
     return {
       selected: [],
+      checked: [],
       checkbox: false,
     }
   },
@@ -126,30 +134,38 @@ export default {
   },
   methods: {
     changeLabel(start, end, arr, empty=null) {
-      // let startLabelChip = document.querySelector(`label[for="previewCheck-${start}"]`).children[1];
-      // startLabelChip.classList.toggle('mdi-arrow-down-drop-circle-outline');
-      // startLabelChip.classList.toggle('mdi-arrow-right-drop-circle');
-      // startLabelChip.classList.toggle('primary--text');
-      // let endLabelChip = document.querySelector(`label[for="previewCheck-${end-1}"]`).children[1];
-      // endLabelChip.classList.toggle('mdi-arrow-down-drop-circle-outline');
-      // endLabelChip.classList.toggle('mdi-arrow-left-drop-circle');
-      // endLabelChip.classList.toggle('primary--text');
 
+      // for (let i = 0; i<this.checked.length; i++) {
+      //   if (empty) {
+          
+      //   }
+      // }
       for (let i=1; i<arr.length; i++) {
-        let selectedLabelCard = document.querySelector(`label[for="previewCheck-${arr[i].value}"]`).children[0];
+        let selectedDiv = document.getElementById(`previewCheckboxes-${i}`);
+        // let selectedCheckbox = selectedDiv.querySelector('input[type="checkbox"]');
         if (empty) {
-          selectedLabelCard.classList.remove("blue-grey");
-          selectedLabelCard.classList.remove("lighten-4");
+          selectedDiv.classList.remove("borderBlue");
+          // selectedCheckbox.checked = false;
+          // selectedDiv.classList.remove("lighten-4");
         } else if (start <= arr[i].value && arr[i].value < end) {
-          selectedLabelCard.classList.add("blue-grey");
-          selectedLabelCard.classList.add("lighten-4");
+          selectedDiv.classList.add("borderBlue");
+          // selectedCheckbox.checked = true;
+
+          // selectedDiv.classList.add("lighten-4");
         } else if (start <= arr[i].value && arr[i].value >= end) {
-          selectedLabelCard.classList.remove("blue-grey");
-          selectedLabelCard.classList.remove("lighten-4");
+          selectedDiv.classList.remove("borderBlue");
+          // selectedCheckbox.checked = false;
+          // selectedDiv.classList.remove("lighten-4");
         }
       }
     },
+    onCheckboxClicked() {
+      // e.preventDefault();
+      // this.selected.push(e.target._value);
+      // console.log(this.selected);
+    },
     checkboxClicked() {
+      console.log(this.selected);
       // let targetId = e.target.id;
       // let targetVal = e.target.value;
       // let targetLabel = document.getElementById(targetId).parentElement.querySelector(".previewLabel");
@@ -200,18 +216,39 @@ export default {
 	max-height: 500px;
 	overflow: auto;
 }
-.previewLabelCard {
-  border: 1px solid red;
+.previewCheckboxes {
+  display: flex;
+  max-width: 600px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+.borderBlue {
+  border: 1px solid #2196F3;
+}
+.previewLabel {
+  width: 80%;
 }
 .font-class {
 	font-family: 'S-CoreDream-3Light',  sans-serif;
 	font-weight: 500;
 	text-align: center;
 }
+.checkboxWrapper {
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .previewCheckbox {
 	display: none;
 }
+.mdi-check-circle::before {
+  color: #dedede;
+}
 
+.previewCheckbox:checked + .mdi-check-circle::before {
+  color: #2196F3;
+}
 .previewCheckbox:checked + label {
 	backdrop-filter: grayscale(10%);
 }
