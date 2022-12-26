@@ -82,14 +82,14 @@
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
 									</v-btn>
-									<v-btn
+									<!-- <v-btn
 										width="100%"
 										color="accent"
 										outlined
 										@click="tempPreview"
 									>
 										TEMP
-									</v-btn>
+									</v-btn> -->
 								</v-col>
 							</v-row>
 							<v-row>
@@ -204,7 +204,7 @@ export default {
 					// console.log(getFormData(this.formData));
 
 					axios({					// axios 통신 시작
-          url: "/scope/",	// back 서버 주소
+          url: "https://rest.finger.solutions/api/SttScope/",	// back 서버 주소
           method: "POST",
 					data: this.formData,
 					headers: {
@@ -295,7 +295,7 @@ export default {
 				// }, new FormData());
 				// console.log(getFormData(this.formData));
 				axios({					// axios 통신 시작
-				url: "/rest/",	// back 서버 주소
+				url: "https://rest.finger.solutions/api/ReviewStt/",	// back 서버 주소
 				method: "POST",
 				data: this.formData,
 				headers: {
