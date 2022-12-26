@@ -8,13 +8,16 @@
         lazy-validation
       >
         <div @click="isSignup = false;">click it</div>
-        <v-text-field
-          v-model="email"
-          :rules="emailRules"
-          label="이메일"
-          type="email"
-          required
-        ></v-text-field>
+        <span class="d-flex">
+          <v-text-field
+            v-model="email"
+            :rules="emailRules"
+            label="이메일"
+            type="email"
+            required
+          ></v-text-field>
+          <v-btn>중복 확인</v-btn>
+        </span>
         <v-text-field
           v-model="pw"
           :rules="passwordRules"
@@ -67,26 +70,19 @@
 				<v-col cols="3" md="2" class="d-flex justify-center align-center">
 					<v-btn
 						width="100%"
-						color="accent"
 						outlined
 						@click="execDaumPostcode"
 					>찾기</v-btn>
 				</v-col>
 			</v-row>
-
-        <v-btn
-          color="error"
-          class="mr-4"
-          @click="reset"
-        >
-          Reset Form
-        </v-btn>
-        <v-btn
-          color="info"
-          @click="send"
-        >
-          send
-        </v-btn>
+        <v-col cols="12">
+          <v-btn
+            style="width: 100%;"
+            @click="send"
+          >
+            회원가입 신청
+          </v-btn>
+        </v-col>
       </v-form>
       <v-form
         v-else
@@ -221,9 +217,6 @@ export default {
 					},
 				}).open();
 			},
-    reset () {
-      this.$refs.form.reset()
-    },
     send () {
       console.log(this.name, this.email, this.select);
       const data = {

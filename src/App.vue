@@ -102,6 +102,7 @@ export default {
     modeChanged(val) {
       this.mode = val;
       if (val === 2) {
+        this.toSignIn = false;
         this.applicationForm = false;
         if (val) this.checkHistory = false;
         this.changeAppBarColor(false);

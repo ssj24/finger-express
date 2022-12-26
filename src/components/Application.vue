@@ -21,7 +21,7 @@
 						<v-card-subtitle>
 							묶음배송 가능할 경우, 등기비용, CD비용은 한 번만 청구됩니다.
 						</v-card-subtitle>
-						<v-radio-group v-model="delivery">
+						<v-radio-group v-model="delivery" class="pl-5 mb-5">
 							<v-radio
 								label="이메일 배송 (PDF로 제공됩니다)"
 								value="1"
@@ -39,6 +39,7 @@
 						<v-checkbox
 							v-model="authentication"
 							label="공증 필요 (+5,000원)"
+							class="pl-5 mt-8"
 						></v-checkbox>
 					</v-card>
 				</v-col>
@@ -52,29 +53,26 @@
 						</v-card-subtitle>
 						<v-form
 							ref="form"
-							v-model="valid"
 							lazy-validation
 						>
 							<!-- 파일 업로드 -->
 							<v-row class="pa-0">
-								<v-col cols="8" md="10"
+								<v-col cols="6" md="4" class="pb-0"
 								>
-								<v-file-input
-									v-model="files"
-									color="orange accent-4"
-									class="pa-0"
-									counter
-									multiple
-									label="파일 업로드"
-									accept="audio/*, video/*"
-									@change="uploadHandler"
-									placeholder="음성 파일을 선택해주세요"
-									:rules="fileRules"
-									id="fileInput"
-								>
-								</v-file-input>
+									<v-file-input
+										v-model="uploadFiles"
+										class="pa-0"
+										multiple
+										label="파일 업로드"
+										accept="audio/*, video/*"
+										@change="uploadHandler"
+										placeholder="음성 파일을 선택해주세요"
+										:rules="fileRules"
+										id="fileInput"
+									>
+									</v-file-input>
 								</v-col>
-								<v-col cols="4" md="2" class="d-flex justify-center align-center mb-4">
+								<v-col cols="4" offset-md="6" md="2" class="d-flex justify-center align-center mb-4">
 									<v-btn
 										width="100%"
 										color="accent"
@@ -84,14 +82,14 @@
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
 									</v-btn>
-									<v-btn
+									<!-- <v-btn
 										width="100%"
 										color="accent"
 										outlined
 										@click="tempPreview"
 									>
 										TEMP
-									</v-btn>
+									</v-btn> -->
 								</v-col>
 							</v-row>
 							<v-row>
@@ -101,31 +99,30 @@
 									class="pt-0"
 								>
 									<!-- <audio id="audio-preview" controls v-show="file != ''"/> -->
-									<v-card @drop="dragFile" class="pa-5 dragContainer">
-										<span v-if="!files.length" class="emptyFileName">
+									<div @click="onFileContainerClicked" @drop="dragFile" class="dragContainer">
+										<v-row v-if="!files.length" class="emptyFileName pa-5  no-gutters">
 											<v-icon left>
 												mdi-music-note-plus
 											</v-icon>
 											파일을 드래그해서 추가해주세요
-										</span>
-										<span v-else v-for="(f, i) in files" :key="i" class="fileName">
-											<span>
-												<div class="text-subtitle-2">{{f.sizeInMB}}MB</div>
-												<p class="text-subtitle-1 text--primary">
-													{{ f.name }}
-												</p>
-											</span>
-											<span @click="deleteF(i)">X</span>
-											<!-- <v-chip
-												color="accent"
-												class="col-11 chip-overflow"
-												style="line-height: 100%;"
-												label
-											>
-												{{ f.name }}
-											</v-chip> -->
-										</span>
-									</v-card>
+										</v-row>
+										<v-row v-else class="pa-5">
+											<v-col cols="12" sm="6" md="4" class="fileName" v-for="(f, i) in files" :key="i" >
+												<div class="fileItem" @click="deleteF(i, $event)" >
+													<v-icon left>
+														mdi-music
+													</v-icon>
+													<span class="ml-3 d-inline-block text-truncate">
+														<p class="text-subtitle-1 text--primary mb-0 ">
+															{{ f.name }}
+														</p>
+														<p class="text-subtitle-2 mb-0">{{f.sizeInMB}}MB</p>
+													</span>
+												</div>
+											</v-col>
+											<!-- <v-col @click="deleteF(i)">X</v-col> -->
+										</v-row>
+									</div>
 								</v-col>
 							</v-row>
 
@@ -133,9 +130,9 @@
 					</v-card>
 				</v-col>
 			</v-row>
-			<v-row>
+			<v-row class="flex-grow-1">
 				<v-col cols="12">
-					<Sentences :valid="valid" :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @resetClicked="reset" @validateClicked="validate"/>
+					<Sentences :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @resetClicked="reset" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
@@ -167,9 +164,9 @@ export default {
 			let clientMail = 'client@test.com';
 			return {
 				clientMail,
-				valid: true,
 				delivery: 1,
 				authentication: false,
+				uploadFiles: [],
 				files: [],
 				fileRules: [
 					v => !!v || '파일을 등록해주세요'
@@ -207,7 +204,7 @@ export default {
 					// console.log(getFormData(this.formData));
 
 					axios({					// axios 통신 시작
-          url: "/scope/",	// back 서버 주소
+          url: "https://rest.finger.solutions/api/SttScope/",	// back 서버 주소
           method: "POST",
 					data: this.formData,
 					headers: {
@@ -216,7 +213,6 @@ export default {
         }).then(res => {				// back 서버로부터 응답받으면
             console.log(res);		// back 서버에서 보낸 message 출력
 						if (res.statusText === 'OK') {
-
 							this.isComplete = true;
 							this.$emit('changeMode', true);
 						}
@@ -226,10 +222,10 @@ export default {
       reset () {
         this.$refs.form.reset();
       },
-			showFile() {
+			showFile(files) {
 				window.URL = window.URL || window.webkitURL;
 				let video = document.createElement('video');
-				for (const f of this.files) {
+				for (const f of files) {
 					video.addEventListener('loadedmetadata', () => {
 						window.URL.revokeObjectURL(video.src);
 						f.duration = video.duration;
@@ -237,13 +233,11 @@ export default {
 					video.preload = 'metadata';
 					video.src = URL.createObjectURL(f);
 					f.sizeInMB = (f.size / (1024*1024)).toFixed(2);
-					// const date = new Date();
-					// f.createdAt = `_${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
-					console.log(f);
+					this.files.push(f);
 				}
 			},
 			uploadHandler() {
-				this.showFile();
+				this.showFile(this.uploadFiles);
 				// this.previewAudio();
 			},
 			// previewAudio(){
@@ -256,14 +250,29 @@ export default {
       //       audio.src = reader.result;
       //   });
 			// },
-			dragFile(e) {
-				for (const f of e.dataTransfer.files) {
-					this.files.push(f);
+			onFileContainerClicked(e) {
+				if (!e.target.closest('.fileName')) {
+					document.getElementById('fileInput').click();
 				}
-				this.showFile();
+			},
+			dragFile(e) {
+				// for (const f of e.dataTransfer.files) {
+				// 	this.files.push(f);
+				// }
+				this.showFile(e.dataTransfer.files);
       },
-			deleteF(index) {
+			deleteF(index, e) {
+				e.preventDefault();
 				this.files.splice(index, 1);
+			},
+			msToMin(ms) {
+				const minutes = Math.floor(ms / 60000);
+				const seconds = ((ms % 60000) / 1000).toFixed(0);
+				return (
+					seconds == 60 ?
+					(minutes+1) + ":00" :
+					minutes + ":" + (seconds < 10 ? "0" : "") + seconds
+				);
 			},
 			showPreview() {
 				if (this.files.length) {
@@ -286,7 +295,7 @@ export default {
 				// }, new FormData());
 				// console.log(getFormData(this.formData));
 				axios({					// axios 통신 시작
-				url: "/rest/",	// back 서버 주소
+				url: "https://rest.finger.solutions/api/ReviewStt/",	// back 서버 주소
 				method: "POST",
 				data: this.formData,
 				headers: {
@@ -297,6 +306,10 @@ export default {
 					this.previewText.push(...res.data[0].sentence);
 					this.serverFileNameList.push(res.data[0].file_name);
 					console.log(this.previewText);
+					for (let t of this.previewText) {
+						t.minStart = this.msToMin(t.start);
+						t.minEnd = this.msToMin(t.end);
+					}
 					this.preview = true;
 			}).catch(err => console.log(err));
 			}
@@ -596,6 +609,10 @@ export default {
 				];
 				this.previewText.push(...previewList);
 				this.serverFileNameList.push('temp_file_name');
+				for (let t of this.previewText) {
+					t.minStart = this.msToMin(t.start);
+					t.minEnd = this.msToMin(t.end);
+				}
 				console.log(this.previewText);
 				this.preview = true;
 			}
@@ -617,31 +634,40 @@ export default {
 	display: flex;
 	justify-content: center;
 }
-.dragContainer {
-	min-height: 120px;
-	height: auto;
+.v-input--radio-group--column .v-radio:not(:last-child):not(:only-child) {
+	margin-bottom: 15px;
 }
+.dragContainer {
+	border: 1px solid #dfdfdf;
+	margin: 10px;
+	height: 186px;
+	overflow: auto;
+	border-radius: 10px;
+}
+
 .emptyFileName {
-	height: 120px;
+	height: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	border-radius: 10px;
 }
-.fileName {
-	width: 100%;
+.emptyFileName:hover {
+	border: 5px solid #2195f3;
+	// background-color: #2195f36c;
+}
+.fileItem {
+	padding: 10px 20px;
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
+	flex-basis: 1;
+	border: 1px solid #dfdfdf;
+	border-radius: 10px;
+	background-color: #f8faffb0
 }
-.fileName span:nth-child(2) {
-	text-align: center;
-	padding: 5px 10px;
-	border-radius: 50%;
-}
-.fileName span:nth-child(2):hover {
-	cursor: pointer;
-	color: red;
-	background-color: rgba(255, 0, 0, 0.209);
+.fileItem:hover {
+	background-color: #2195f36c;
+	cursor: url('../assets/delete.png'), auto;
 }
 .plainChip {
 	background: transparent !important;
