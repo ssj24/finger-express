@@ -224,7 +224,7 @@ export default {
         stt_scope: scopeData
       })
       console.log(selectedData);
-      // this.$emit('validateClicked', selectedData)
+      this.$emit('validateClicked', selectedData)
     },
   }
 }
