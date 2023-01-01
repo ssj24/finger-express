@@ -65,9 +65,9 @@
               :value=i
               class="previewCheckbox"
               :id="'previewCheck-'+i"
-              @click="onCheckboxClicked(i, $event)"
+              @change="checkboxClicked"
             />
-              <!-- @change="checkboxClicked" -->
+              <!-- @click="onCheckboxClicked(i, $event)" -->
             <span class="mdi mdi-24px mdi-check-circle"></span>
 
           </div>
@@ -121,29 +121,26 @@ export default {
       selected: [],
       checked: [],
       checkbox: false,
-      previewCheckboxes: HTMLCollection,
+      previewCheckboxes: NodeList,
       previewCheckboxesArray: [],
     }
   },
   watch: {
-    // selected(newVal) {
-    //   console.log('watch-selected', newVal);
-    // }
+    showPreview() {
+      setTimeout(() => {
+        this.previewCheckboxes = document.querySelectorAll('.previewCheckboxes');
+        this.previewCheckboxesArray = Array.from(this.previewCheckboxes);
+      }, 500);
+    }
   },
-  mounted() {
-    this.previewCheckboxes = document.querySelectorAll('.previewCheckbox');
-    this.previewCheckboxesArray = Array.from(this.previewCheckboxes);
+  updated() {
+    
   },
   methods: {
     changeLabel(start, end, empty=null) {
-      // console.log(start, end)
-      // for (let i = 0; i<this.checked.length; i++) {
-      //   if (empty) {
-          
-      //   }
-      // }
-      for (let i=1; i<this.previewCheckboxesArray.length; i++) {
-        let selectedDiv = document.getElementById(`previewCheckboxes-${i}`);
+      for (let i=start; i<this.previewCheckboxesArray.length; i++) {
+        let selectedDiv = this.previewCheckboxesArray[i];
+        // let selectedDiv = document.getElementById(`previewCheckboxes-${i}`);
         // let selectedCheckbox = selectedDiv.querySelector('input[type="checkbox"]');
         if (empty !== null) {
           selectedDiv.classList.remove("borderBlue");
@@ -162,41 +159,37 @@ export default {
       }
     },
     onCheckboxWrapperClicked(i, e) {
-      // const target = document.getElementById('previewCheck-' + i);
-      // this.onCheckboxClicked(i, e)
-      console.log(i, e);
+      const target = document.getElementById('previewCheck-' + i);
+      if (!target) { alert(e)}
+      // console.log('onCheckboxWrapperClicked', i, e);
     },
     onCheckboxClicked(i, e) {
-      e.preventDefault();
-      console.log('out', this.selected)
+      // e.preventDefault();
+      if (e.target === 'an') {alert(e)}
       if (!this.selected.includes(i)) {
-        console.log(this.selected);
+        console.log('onCheckboxClicked-this.selected', this.selected);
         document.getElementById('previewCheck-' + i).checked = true;
         this.selected.push(i);
         this.checkboxClicked();
       } else {
         document.getElementById('previewCheck-' + i).checked = false;
         this.selected = this.selected.filter(x => x!==i);
-        console.log(this.selected);
+        console.log('onCheckboxClicked-else-this.selected-filtered', this.selected);
         this.checkboxClicked();
       }
       // this.selected.push(e.target._value);
       // console.log(this.selected);
     },
     checkboxClicked() {
-      console.log(this.selected);
-      // let targetId = e.target.id;
-      // let targetVal = e.target.value;
-      // let targetLabel = document.getElementById(targetId).parentElement.querySelector(".previewLabel");
+      console.log(this.selected)
       if (!this.selected.length) {
-        this.changeLabel(0, this.previewCheckboxesArray.length, true);
+        return this.changeLabel(0, this.previewCheckboxesArray.length, true);
       }
-      let sortedSelect = this.selected.sort(function(a, b){return a-b});
-      sortedSelect.forEach((x, i) => {
+      this.selected.sort(function(a, b){return a-b});
+      this.selected.forEach((x, i) => {
         if(i % 2 == 1) {
-          this.changeLabel(sortedSelect[i-1], x);
-        } else if (i == sortedSelect.length -1) {
-          console.log('last');
+          this.changeLabel(this.selected[i-1], x);
+        } else if (i == this.selected.length -1) {
           this.changeLabel(x, this.previewCheckboxesArray.length);
         }
       });
