@@ -19,7 +19,7 @@
           </p>
         </v-row>
         <div class="text--primary previewCheckboxes" :id="'previewCheckboxes-'+i" v-for="(text, i) in previewText" :key="i">
-          <label :for="'previewCheck-'+i" class="previewLabel">
+          <div @click="onLabelClicked(i, $event)" class="previewLabel">
             <div v-if="i==0" class="disabledLabel pa-5">
               <v-card-subtitle>전체 선택하기</v-card-subtitle>
             </div>
@@ -57,7 +57,7 @@
                 </v-col>
               </v-row>
             </div>
-          </label>
+          </div>
           <div class="checkboxWrapper" @click="onCheckboxWrapperClicked(i, $event)">
             <input
               type="checkbox"
@@ -65,8 +65,8 @@
               :value=i
               class="previewCheckbox"
               :id="'previewCheck-'+i"
-              @change="checkboxClicked"
             />
+              <!-- @change="checkboxClicked" -->
               <!-- @click="onCheckboxClicked(i, $event)" -->
             <span class="mdi mdi-24px mdi-check-circle"></span>
 
@@ -118,6 +118,7 @@ export default {
   },
   data: () => {
     return {
+      temp: null,
       selected: [],
       checked: [],
       checkbox: false,
@@ -137,7 +138,7 @@ export default {
     
   },
   methods: {
-    changeLabel(start, end, empty=null) {
+    changeLabel(start, end, bool, empty=null) {
       for (let i=start; i<this.previewCheckboxesArray.length; i++) {
         let selectedDiv = this.previewCheckboxesArray[i];
         // let selectedDiv = document.getElementById(`previewCheckboxes-${i}`);
@@ -163,6 +164,26 @@ export default {
       if (!target) { alert(e)}
       // console.log('onCheckboxWrapperClicked', i, e);
     },
+    setPeriod() {
+      console.log(this.temp)
+    },
+    onLabelClicked(i, e) {
+      const target = e.target.closest('.previewCheckboxes');
+      if (!this.temp) {
+        this.temp = i;
+        target.classList.add('borderBlue');
+        this.setPeriod();
+      } else {
+        console.log('else', this.temp);
+        for (let item=this.temp; item <= i; item++) {
+          this.selected.push(item);
+        }
+        // this.temp = false;
+        console.log(this.selected);
+        }
+      // const targetCheckbox = document.getElementById('previewCheck-'+i);
+      // targetCheckbox.checked = !targetCheckbox.checked;
+    },
     onCheckboxClicked(i, e) {
       // e.preventDefault();
       if (e.target === 'an') {alert(e)}
@@ -183,16 +204,14 @@ export default {
     checkboxClicked() {
       console.log(this.selected)
       if (!this.selected.length) {
-        return this.changeLabel(0, this.previewCheckboxesArray.length, true);
+        return this.changeLabel(0, this.previewCheckboxesArray.length, false, true);
       }
       this.selected.sort(function(a, b){return a-b});
-      this.selected.forEach((x, i) => {
-        if(i % 2 == 1) {
-          this.changeLabel(this.selected[i-1], x);
-        } else if (i == this.selected.length -1) {
-          this.changeLabel(x, this.previewCheckboxesArray.length);
-        }
-      });
+      for (let i=0; i<this.selected.length; i++) {
+        if (i === 0) {
+          this.changeLabel(0, this.selected[i], false)
+        } 
+      }
     },
     reset () {
       this.$emit('resetClicked')
@@ -217,7 +236,7 @@ export default {
         stt_scope: scopeData
       })
       console.log(selectedData);
-      this.$emit('validateClicked', selectedData)
+      // this.$emit('validateClicked', selectedData)
     },
   }
 }
@@ -268,13 +287,13 @@ export default {
 .previewCheckbox:checked + .mdi-check-circle::before {
   color: #2196F3;
 }
-.previewCheckbox:checked + label {
+.previewCheckbox:checked + .previewLabel {
 	backdrop-filter: grayscale(10%);
 }
-.previewCheckbox:disabled + label {
+.previewCheckbox:disabled + .previewLabel {
 	pointer-events: none;
 }
-label:hover {
+.previewLabel:hover {
 	cursor: pointer;
 }
 .disabledLabel {
