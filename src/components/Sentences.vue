@@ -19,11 +19,8 @@
           </p>
         </v-row>
         <div class="text--primary previewCheckboxes" :id="'previewCheckboxes-'+i" v-for="(text, i) in previewText" :key="i">
-          <label :for="'previewCheck-'+i" class="previewLabel">
-            <div v-if="i==0" class="disabledLabel pa-5">
-              <v-card-subtitle>전체 선택하기</v-card-subtitle>
-            </div>
-            <div v-else class="px-5 previewLabelCard my-5">
+          <div @click="onLabelClicked(i, $event)" class="previewLabel">
+            <div class="px-5 previewLabelCard my-5">
               <v-card-subtitle>
                 <v-row>
                   <v-chip
@@ -40,7 +37,7 @@
                   </v-chip>
                   <v-chip
                     class="my-2 plainChip"
-                    color="white"
+                    color="transparent"
                     label
                     plain
                   >
@@ -57,17 +54,17 @@
                 </v-col>
               </v-row>
             </div>
-          </label>
-          <div class="checkboxWrapper" @click="onCheckboxWrapperClicked(i, $event)">
+          </div>
+          <div class="checkboxWrapper" @click="onCheckboxWrapperClicked(i)">
             <input
               type="checkbox"
               v-model="selected"
               :value=i
               class="previewCheckbox"
               :id="'previewCheck-'+i"
-              @click="onCheckboxClicked(i, $event)"
             />
               <!-- @change="checkboxClicked" -->
+              <!-- @click="onCheckboxClicked(i, $event)" -->
             <span class="mdi mdi-24px mdi-check-circle"></span>
 
           </div>
@@ -97,11 +94,21 @@
           width="100%"
           class="mr-4"
           color="accent"
-          @click="validate"
+          @click="all"
         >
-          등록
+          전체 선택
         </v-btn>
       </v-col>
+    </v-row>
+    <v-row>
+      <v-btn
+        width="100%"
+        class="mr-4"
+        color="accent"
+        @click="validate"
+      >
+        등록
+      </v-btn>
     </v-row>
   </v-row>
 
@@ -118,32 +125,30 @@ export default {
   },
   data: () => {
     return {
+      temp: false,
       selected: [],
       checked: [],
       checkbox: false,
-      previewCheckboxes: HTMLCollection,
+      previewCheckboxes: NodeList,
       previewCheckboxesArray: [],
     }
   },
   watch: {
-    // selected(newVal) {
-    //   console.log('watch-selected', newVal);
-    // }
+    showPreview() {
+      setTimeout(() => {
+        this.previewCheckboxes = document.querySelectorAll('.previewCheckboxes');
+        this.previewCheckboxesArray = Array.from(this.previewCheckboxes);
+      }, 500);
+    }
   },
-  mounted() {
-    this.previewCheckboxes = document.querySelectorAll('.previewCheckbox');
-    this.previewCheckboxesArray = Array.from(this.previewCheckboxes);
+  updated() {
+    
   },
   methods: {
-    changeLabel(start, end, empty=null) {
-      // console.log(start, end)
-      // for (let i = 0; i<this.checked.length; i++) {
-      //   if (empty) {
-          
-      //   }
-      // }
-      for (let i=1; i<this.previewCheckboxesArray.length; i++) {
-        let selectedDiv = document.getElementById(`previewCheckboxes-${i}`);
+    changeLabel(start, end, bool, empty=null) {
+      for (let i=start; i<this.previewCheckboxesArray.length; i++) {
+        let selectedDiv = this.previewCheckboxesArray[i];
+        // let selectedDiv = document.getElementById(`previewCheckboxes-${i}`);
         // let selectedCheckbox = selectedDiv.querySelector('input[type="checkbox"]');
         if (empty !== null) {
           selectedDiv.classList.remove("borderBlue");
@@ -161,48 +166,54 @@ export default {
         }
       }
     },
-    onCheckboxWrapperClicked(i, e) {
-      // const target = document.getElementById('previewCheck-' + i);
-      // this.onCheckboxClicked(i, e)
-      console.log(i, e);
-    },
-    onCheckboxClicked(i, e) {
-      e.preventDefault();
-      console.log('out', this.selected)
+    onCheckboxWrapperClicked(i) {
+      const target = document.getElementById('previewCheck-' + i).closest('.previewCheckboxes');
       if (!this.selected.includes(i)) {
-        console.log(this.selected);
-        document.getElementById('previewCheck-' + i).checked = true;
         this.selected.push(i);
-        this.checkboxClicked();
       } else {
-        document.getElementById('previewCheck-' + i).checked = false;
-        this.selected = this.selected.filter(x => x!==i);
-        console.log(this.selected);
-        this.checkboxClicked();
+        this.selected = this.selected.filter(x => x !== i)
       }
-      // this.selected.push(e.target._value);
-      // console.log(this.selected);
+      target.classList.toggle('borderBlue')
+      console.log(this.selected)
     },
-    checkboxClicked() {
-      console.log(this.selected);
-      // let targetId = e.target.id;
-      // let targetVal = e.target.value;
-      // let targetLabel = document.getElementById(targetId).parentElement.querySelector(".previewLabel");
-      if (!this.selected.length) {
-        this.changeLabel(0, this.previewCheckboxesArray.length, true);
-      }
-      let sortedSelect = this.selected.sort(function(a, b){return a-b});
-      sortedSelect.forEach((x, i) => {
-        if(i % 2 == 1) {
-          this.changeLabel(sortedSelect[i-1], x);
-        } else if (i == sortedSelect.length -1) {
-          console.log('last');
-          this.changeLabel(x, this.previewCheckboxesArray.length);
+    setPeriod() {
+      console.log(this.temp)
+    },
+    onLabelClicked(i, e) {
+      console.log('f', i, this.temp)
+      if (this.temp === false) {
+        this.temp = i;
+        e.target.closest('.previewCheckboxes').classList.add('borderBlue');
+        e.target.closest('.previewCheckboxes').classList.add('backBlue');
+        this.setPeriod();
+      } else {
+        for (let item=this.temp; item <= i; item++) {
+          if (item == this.temp) {
+            document.getElementById('previewCheckboxes-'+item).classList.remove('backBlue');
+          }
+          if (!this.selected.includes(item)) {
+            this.selected.push(item);
+            document.getElementById('previewCheckboxes-'+item).classList.add('borderBlue');
+          }
         }
-      });
+        this.temp = false;
+        console.log(this.selected);
+        }
+      // const targetCheckbox = document.getElementById('previewCheck-'+i);
+      // targetCheckbox.checked = !targetCheckbox.checked;
     },
+
     reset () {
-      this.$emit('resetClicked')
+      for (const i of this.selected) {
+        document.getElementById('previewCheckboxes-'+i).classList.remove('borderBlue');
+      }
+      this.selected = [];
+    },
+    all () {
+      for (let i=0; i<this.previewText.length; i++) {
+        this.selected.push(i);
+        document.getElementById('previewCheckboxes-'+i).classList.add('borderBlue');
+      }
     },
     validate () {
       const selectedData = [];
@@ -224,7 +235,7 @@ export default {
         stt_scope: scopeData
       })
       console.log(selectedData);
-      this.$emit('validateClicked', selectedData)
+      // this.$emit('validateClicked', selectedData)
     },
   }
 }
@@ -248,6 +259,9 @@ export default {
 .borderBlue {
   border: 1px solid #2196F3;
 }
+.backBlue {
+  background-color: #AEE2FF;
+}
 .previewLabel {
   width: 100%;
   min-width: 80%;
@@ -266,22 +280,25 @@ export default {
   align-items: center;
 }
 .previewCheckbox {
-	/* display: none; */
+	display: none;
 }
 .mdi-check-circle::before {
   color: #dedede;
+}
+.checkboxWrapper:hover .mdi-check-circle::before {
+  color: #AEE2FF;
 }
 
 .previewCheckbox:checked + .mdi-check-circle::before {
   color: #2196F3;
 }
-.previewCheckbox:checked + label {
+.previewCheckbox:checked + .previewLabel {
 	backdrop-filter: grayscale(10%);
 }
-.previewCheckbox:disabled + label {
+.previewCheckbox:disabled + .previewLabel {
 	pointer-events: none;
 }
-label:hover {
+.previewLabel:hover {
 	cursor: pointer;
 }
 .disabledLabel {

@@ -56,23 +56,22 @@
 							lazy-validation
 						>
 							<!-- 파일 업로드 -->
-							<v-row class="pa-0">
-								<v-col cols="6" md="4" class="pb-0"
+							<v-row class="px-5">
+								<v-col cols="8" md="6" class="pb-0"
 								>
 									<v-file-input
 										v-model="uploadFiles"
 										class="pa-0"
 										multiple
-										label="파일 업로드"
+										label="파일 첨부"
 										accept="audio/*, video/*"
 										@change="uploadHandler"
-										placeholder="음성 파일을 선택해주세요"
 										:rules="fileRules"
 										id="fileInput"
 									>
 									</v-file-input>
 								</v-col>
-								<v-col cols="4" offset-md="6" md="2" class="d-flex justify-center align-center mb-4">
+								<v-col cols="4" offset-md="4" md="2" class="d-flex justify-center align-center mb-4">
 									<v-btn
 										width="100%"
 										color="accent"
@@ -82,14 +81,14 @@
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
 									</v-btn>
-									<!-- <v-btn
+									<v-btn
 										width="100%"
 										color="accent"
 										outlined
 										@click="tempPreview"
 									>
 										TEMP
-									</v-btn> -->
+									</v-btn>
 								</v-col>
 							</v-row>
 							<v-row>
@@ -132,7 +131,7 @@
 			</v-row>
 			<v-row class="flex-grow-1">
 				<v-col cols="12">
-					<Sentences :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @resetClicked="reset" @validateClicked="validate"/>
+					<Sentences :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
@@ -158,9 +157,7 @@ export default {
 			mode: Number,
 		},
     data: () => {
-			let previewText = [
-				{},
-			];
+			let previewText = [];
 			let clientMail = 'client@test.com';
 			return {
 				clientMail,
@@ -640,8 +637,8 @@ export default {
 .dragContainer {
 	border: 1px solid #dfdfdf;
 	margin: 10px;
-	height: 186px;
-	overflow: auto;
+	height: 202px;
+	overflow-x: hidden;
 	border-radius: 10px;
 }
 
