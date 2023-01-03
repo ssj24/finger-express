@@ -6,30 +6,40 @@
 		</h1>
     <div>날짜 필터</div>
 	</v-row>
-	<v-row class="form-contents py-16 flex-grow-1">
-		<v-col cols="11" md="9" class="d-flex flex-column" v-for="(x, i) in orderList" :key="x.file.name">
+	<v-row class="form-contents flex-column align-center py-16 flex-grow-1">
+		<v-col cols="11" md="4" class="d-flex flex-column" v-for="(x, i) in orderList" :key="x.files[0].file_date">
 			<v-card>
         <div class="cardHeader d-flex justify-space-between">
-          <v-card-title>
-            {{x.file.name}}
-          </v-card-title>
-          <v-btn class="downloadBtn" @click="download(x.file.name)">다운로드</v-btn>
+          <div class="cardHeaderLef">
+            <v-card-subtitle class="d-flex">
+              <p class="mr-5">
+                주문일: {{x.order_at}}
+              </p>
+              <p>
+                주문자: {{x.client_name}}({{x.phone}})
+              </p>
+            </v-card-subtitle>
+            <v-card-title>
+              {{x.files[0].file_date}}{{x.files.length>1 ? `외 ${x.files.length-1}건` : ''}}({{x.files[0].total_duration}})
+            </v-card-title>
+          </div>
+          <v-btn class="downloadBtn" @click="download(x.files[0].file_date)">다운로드</v-btn>
         </div>
         <table class="cardContents">
           <tr>
             <td>요청길이</td>
-            <td>{{x.file.duration}}</td>
+            <td>{{x.files[0].slice_duration}}</td>
           </tr>
           <tr>
             <td>옵션</td>
-            <td>{{x.options.join(', ')}}</td>
+            <td>{{x.files[0].delivery.concat(x.files[0].notarial ? ', 공증' : '')}}</td>
           </tr>
         </table>
         <hr>
         <div class="d-flex justify-space-between">
           <p>주문상황</p>
           <button class="openStatus" @click="openStatus(i)">
-            {{x.status}}
+            {{x.files[0].stage}}
             <span class="mdi mdi-chevron-down"></span>
           </button>
         </div>
@@ -77,52 +87,89 @@ export default {
   data: () => ({
     orderList: [
       {
-        date: '2022-12-23',
-        file: {
-          name: 'sample1',
-          duration: '1230',
-        },
-        options: ['등기+CD', '공증'],
-        status: 3,
+        client_name: '홍길동',
+        phone: '010-0000-0000',
+        order_at: '2022-08-24',
+        files : [
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'draft',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          },
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'draft',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          },
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'draft',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          },
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'final',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          }
+        ]
       },
       {
-        date: '2022-12-23',
-        file: {
-          name: 'sample2',
-          duration: '12301234',
-        },
-        options: ['등기+CD', '공증'],
-        status: 3,
-      },
-      {
-        date: '2022-12-23',
-        file: {
-          name: 'sample3',
-          duration: '1230',
-        },
-        options: ['공증'],
-        status: 2,
-      },
-      {
-        date: '2022-12-23',
-        file: {
-          name: 'sample4',
-          duration: '1230',
-        },
-        options: ['등기+CD'],
-        status: 1,
-      },
-      {
-        date: '2022-12-23',
-        file: {
-          name: 'sample5',
-          duration: '12302',
-        },
-        options: ['등기+CD', '공증'],
-        status: 2,
+        client_name: '홍길동',
+        phone: '010-0000-0000',
+        order_at: '2022-08-24',
+        files : [
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'final',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          }
+        ]
+      },{
+        client_name: '홍길동',
+        phone: '010-0000-0000',
+        order_at: '2022-08-24',
+        files : [
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'draft',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          }
+        ]
+      },{
+        client_name: '홍길동',
+        phone: '010-0000-0000',
+        order_at: '2022-08-24',
+        files : [
+          {
+          file_date: 'sample_20221226154030.mp3',
+          total_duration: 324,    // seconds
+          slice_duration: 272,    // seconds
+          delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+          notarial: false,    // 공증 여부 true, false
+          stage: 'draft',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+          }
+        ]
       },
     ],
-    statusList: ['초안 작업중', '초안 검토 요청', '최종본 작업중', '발송완료']
+    statusList: ['초안 작업중', '초안 검토 요청', '최종본 작업중', '발송완료', '수령']
   }),
   methods: {
     openStatus(i) {
