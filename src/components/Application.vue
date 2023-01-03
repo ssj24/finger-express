@@ -131,7 +131,7 @@
 			</v-row>
 			<v-row class="flex-grow-1">
 				<v-col cols="12">
-					<Sentences :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @resetClicked="reset" @validateClicked="validate"/>
+					<Sentences :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
@@ -157,9 +157,7 @@ export default {
 			mode: Number,
 		},
     data: () => {
-			let previewText = [
-				{},
-			];
+			let previewText = [];
 			let clientMail = 'client@test.com';
 			return {
 				clientMail,
