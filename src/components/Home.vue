@@ -190,7 +190,8 @@ export default {
 .main-row {
   padding: 30px 0;
   width: 100%;
-  background-color: navy;
+  background-size: contain;
+  background: navy url('/src/assets/home_back.svg') no-repeat center center;
 }
 .title-banner {
   // background-color: bisque;

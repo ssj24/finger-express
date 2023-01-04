@@ -100,9 +100,9 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row class="justify-center mb-0">
       <v-btn
-        width="100%"
+        width="80%"
         class="mr-4"
         color="accent"
         @click="validate"
