@@ -4,7 +4,8 @@
     <v-app-bar
       app
       elevation="0"
-      color="#000080"
+      color="dark"
+      class="backDark"
     >
       <v-btn
         text
@@ -17,25 +18,29 @@
           alt="Finger Express Logo"
           class="shrink mr-2 py-3"
           contain
-          src="./assets/thunderBig.png"
+          src="./assets/logo.png"
           transition="scale-transition"
-          width="40"
+          width="30"
         />
-
-        <v-app-bar-title
-          class="mt-1 hidden-sm-and-down font-weight white--text"
+        <v-img
+          alt="Finger Express Logo Text"
+          id="logoText"
+          class="hidden-sm-and-down shrink mr-2 py-3"
           contain
-        > Finger Express </v-app-bar-title>
+          src="./assets/titleW.svg"
+          transition="scale-transition"
+          width="100"
+        />
       </v-btn>
 
       <v-spacer></v-spacer>
 
+      <v-btn class="white--text font-weight mr-2" outlined @click="toAdminComponent">관리자</v-btn>
       <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(2)">신청하기</v-btn>
       <!-- <v-btn class="white--text font-weight mr-2" outlined >장바구니</v-btn> -->
       <v-btn class="white--text font-weight mr-2" outlined v-if="this.$store.state.isLogin">마이페이지</v-btn>
-      <v-btn class="white--text font-weight mr-2" outlined @click="toAdminComponent">관리자</v-btn>
       <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(3)">장바구니</v-btn>
-      <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn>
+      <!-- <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn> -->
       <v-btn class="white--text font-weight mr-2" outlined @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
     </v-app-bar>
 
@@ -93,10 +98,11 @@ export default {
   }),
   methods: {
     changeAppBarColor(val) {
-      const present = val ? 'navy' : 'white';
+      const present = val ? 'black' : 'white';
       // const btnColor = val ? 'white' : 'black';
-      document.querySelector('header').style.backgroundColor=present;
-      document.querySelector('.v-app-bar-title').classList.remove(`${present}--text`);
+      document.querySelector('header').classList.toggle('backDark');
+      document.getElementById('logoText').querySelector('.v-image__image.v-image__image--contain').style.border='red';
+      document.querySelector('.v-image__image.v-image__image--contain').style.backgroundImage='/src/assets/titleB.svg';
       const navBtns = document.querySelector('.v-toolbar__content').querySelectorAll('button.white--text');
       navBtns.forEach(btn => {
         btn.classList.remove(`${present}--text`);
@@ -109,15 +115,16 @@ export default {
     },
     modeChanged(val) {
       this.mode = val;
-      if (val === 2) {
+      this.toAdmin = false;
+      if (val === 2 ) {
         this.toSignIn = false;
         this.applicationForm = false;
         if (val) this.checkHistory = false;
-        this.changeAppBarColor(false);
+        // this.changeAppBarColor(false);
       }
     },
     toAdminComponent() {
-      this.changeAppBarColor(false);
+      // this.changeAppBarColor(false);
       this.toAdmin = true;
 
     },
@@ -146,6 +153,9 @@ export default {
 main {
   width: 100%;
   height: auto;
+  overflow: hidden;
 }
-
+// .theme--light.v-app-bar.v-toolbar.v-sheet.backDark {
+//   background-color: #152035;
+// }
 </style>

@@ -24,15 +24,15 @@
 						<v-radio-group v-model="delivery" class="pl-5 mb-5">
 							<v-radio
 								label="이메일 배송 (PDF로 제공됩니다)"
-								value="1"
+								value="email"
 							></v-radio>
 							<v-radio
 								label="등기배송 (+10,000원)"
-								value="2"
+								value="regist"
 							></v-radio>
 							<v-radio
 								label="등기배송 + CD (+17,000원)"
-								value="3"
+								value="regist_cd"
 							></v-radio>
 						</v-radio-group>
 						<hr>
@@ -131,7 +131,7 @@
 			</v-row>
 			<v-row class="flex-grow-1">
 				<v-col cols="12">
-					<Sentences :serverFileNameList="serverFileNameList" :previewText="previewText" :showPreview="preview" @validateClicked="validate"/>
+					<Sentences :previewText="previewText[currentFile]" :showPreview="preview" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
@@ -157,20 +157,21 @@ export default {
 			mode: Number,
 		},
     data: () => {
-			let previewText = [];
+			let previewText = {};
 			let clientMail = 'client@test.com';
+			let currentFile = '';
 			return {
 				clientMail,
-				delivery: 1,
+				delivery: 'email',
 				authentication: false,
 				uploadFiles: [],
 				files: [],
 				fileRules: [
 					v => !!v || '파일을 등록해주세요'
 				],
-				serverFileNameList: [],
 				preview: false,
 				previewText,
+				currentFile,
 				isComplete: false,
 				formData: {},
 			}
@@ -184,9 +185,12 @@ export default {
       validate (val) {
 				console.log(val);
         if (this.files.length) {
+					// modifiedVal = val.map(x => x.total_duration = this.previewText[0])
 					this.formData = {
 						message: 'stt_scope',
 						client_mail: this.clientMail,
+						delivery: this.delivery,
+						notarial: this.authentication,
 						scope_files: val,
 					}
 					console.log(this.formData);
@@ -201,7 +205,7 @@ export default {
 					// console.log(getFormData(this.formData));
 
 					axios({					// axios 통신 시작
-          url: "https://rest.finger.solutions/api/SttScope/",	// back 서버 주소
+          url: "https://exp.finger.solutions/api/OrderRegist/",	// back 서버 주소
           method: "POST",
 					data: this.formData,
 					headers: {
@@ -300,10 +304,10 @@ export default {
 				}
 			}).then(res => {				// back 서버로부터 응답받으면
 					console.log(res);		// back 서버에서 보낸 message 출력
-					this.previewText.push(...res.data[0].sentence);
-					this.serverFileNameList.push(res.data[0].file_name);
+					this.previewText[res.data[0].file_name] = res.data[0].sentence;
+					// this.serverFileNameList.push(res.data[0].file_name);
 					console.log(this.previewText);
-					for (let t of this.previewText) {
+					for (let t of this.previewText[res.data[0].file_name]) {
 						t.minStart = this.msToMin(t.start);
 						t.minEnd = this.msToMin(t.end);
 					}
@@ -604,9 +608,9 @@ export default {
 							"confidence": 0
 					},
 				];
-				this.previewText.push(...previewList);
-				this.serverFileNameList.push('temp_file_name');
-				for (let t of this.previewText) {
+				this.previewText['temp_file_name']=previewList;
+				this.currentFile = 'temp_file_name';
+				for (let t of this.previewText['temp_file_name']) {
 					t.minStart = this.msToMin(t.start);
 					t.minEnd = this.msToMin(t.end);
 				}
