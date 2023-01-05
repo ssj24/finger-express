@@ -5,31 +5,31 @@
 			장바구니
 		</h1>
 	</v-row>
-	<v-row class="form-contents py-16 flex-grow-1">
+	<v-row class="form-contents mx-0 py-16 flex-grow-1">
 		<v-col cols="11" md="6" class="d-flex flex-column">
-      <v-card class="pa-5"  v-for="(text, i) in tempList" :key="i">
+      <v-card class="pa-5"  v-for="(order, i) in orderList" :key="i">
         <v-card-title class="pl-0">
           <span class="text-h5">
-            {{text.files[0].file_date.slice(0, -4)}} {{text.files.length>1 ? `외 ${text.files.length-1}건` : ''}} 
+            {{order.files[0].file_name}} {{order.files.length>1 ? `외 ${order.files.length-1}건` : ''}} 
           </span>
           <span class="timeTotal">
             <img src="../assets/clock.png" alt="시계" width="15" />
-            <p class="mb-0 ml-1">05:24</p>
+            <p class="mb-0 ml-1">{{order.sum_total}}</p>
           </span>
         </v-card-title>
         <table class="cardContents">
           <tr>
             <td>요청길이</td>
-            <td>04:32</td>
+            <td>{{order.sum_slice}}</td>
           </tr>
           <tr>
             <td>옵션</td>
-            <td>등기+CD, 공증</td>
-            <!-- <td>{{x.files[0].delivery.concat(x.files[0].notarial ? ', 공증' : '')}}</td> -->
+            <!-- <td>등기+CD, 공증</td> -->
+            <td>{{order.delivery == 'email' ? '이메일' : order.delivery == 'regist' ? '등기' : '등기 + CD'}}{{(order.notarial==='False' ? '' : ', 공증')}}</td>
           </tr>
         </table>
         <p class="filePrice">
-          {{Intl.NumberFormat('ko-KR').format(text.price)}}원
+          {{Intl.NumberFormat('ko-KR').format(order.sum_price)}}원
         </p>
       </v-card>
       <v-card @click="changeMode(2)" class="addOrder">
@@ -132,6 +132,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
 name: 'BasketComponent',
 props: {
@@ -143,7 +145,8 @@ data: () => {
   let postcode = '';
   let detailAddress = '';
   return {
-    tempList: [],
+    client_mail: 'client@test.com',
+    orderList: [],
     totalPrice: 0,
     name: '',
     nameRules: [
@@ -167,62 +170,100 @@ data: () => {
   }
 },
 created() {
-  this.tempList = [
-    {
-      order_id: 1,
-      delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
-      notarial: false,    // 공증 여부 true, false,
-      price: 37000,
-      files : [
-        {
-          file_date: 'sample_20221226154030.mp3',
-          total_duration: 324,    // seconds
-          slice_duration: 272,    // seconds
-        },
-        {
-          file_date: 'sample_20221226154031.mp3',
-          total_duration: 324,    // seconds
-          slice_duration: 272,    // seconds
-        },
-        {
-          file_date: 'sample_20221226154032.mp3',
-          total_duration: 324,    // seconds
-          slice_duration: 272,    // seconds
-        },
-        {
-          file_date: 'sample_20221226154033.mp3',
-          total_duration: 324,    // seconds
-          slice_duration: 272,    // seconds
-        },
-        {
-          file_date: 'sample_20221226154034.mp3',
-          total_duration: 324,    // seconds
-          slice_duration: 272,    // seconds
-        },
-      ]
-    },
-    {
-      order_id: 2,
-      delivery: 'regist_cd',   // email, regist(등기), regist_cd(등기+CD)
-      notarial: true,    // 공증 여부 true, false,
-      price: 57000,
-      files : [
-        {
-          file_date: 'sample_20221226154030.mp3',
-          total_duration: 23498,    // seconds
-          slice_duration: 3511,    // seconds
-        }
-      ]
+  const formData = {
+    message: 'basket_list_req',
+    client_mail: this.client_mail
+  }
+  console.log('formData', formData);
+  axios({					// axios 통신 시작
+    url: "http://exp.finger.solutions:8200/api/BasketList/",	// back 서버 주소
+    method: "POST",
+    data: formData,
+    headers: {
+      'Content-Type': 'application/json'
     }
-  ];
-  this.name = 'sample';
-  this.phone = '01011111111';
-  this.email = 'test@sample.com';
-  this.postcode = 10204;
-  this.address = '대전시 유성구 대덕대로 512번길 20';
-  this.totalPrice = this.tempList.reduce((total, val) => total + val.price, 0);
+  }).then(res => {				// back 서버로부터 응답받으면
+      console.log(res);
+    if (res.statusText === 'OK') {
+      this.name = res.data.order_info.name;
+      this.phone = res.data.order_info.phone;
+      this.email = res.data.order_info.mail_id; // mail 비교 필요
+      this.postcode = res.data.order_info.post_code;
+      this.address = res.data.order_info.address; // 상세주소와 나눠서 저장..? || 프론트에서 상세주소를 따로 없이..?
+      this.orderList = res.data.order_info.order_list;
+      for (const order of this.orderList) {
+        // order.files = JSON.parse(order.files);
+        this.totalPrice += order.sum_price;
+        order.sum_total = this.msToMin(order.sum_total);
+        order.sum_slice = this.msToMin(order.sum_slice);
+      }
+    }
+  }).catch(err => console.log(err));
+  // this.tempList = [
+  //   {
+  //     order_id: 1,
+  //     delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
+  //     notarial: false,    // 공증 여부 true, false,
+  //     price: 37000,
+  //     files : [
+  //       {
+  //         file_date: 'sample_20221226154030.mp3',
+  //         total_duration: 324,    // seconds
+  //         slice_duration: 272,    // seconds
+  //       },
+  //       {
+  //         file_date: 'sample_20221226154031.mp3',
+  //         total_duration: 324,    // seconds
+  //         slice_duration: 272,    // seconds
+  //       },
+  //       {
+  //         file_date: 'sample_20221226154032.mp3',
+  //         total_duration: 324,    // seconds
+  //         slice_duration: 272,    // seconds
+  //       },
+  //       {
+  //         file_date: 'sample_20221226154033.mp3',
+  //         total_duration: 324,    // seconds
+  //         slice_duration: 272,    // seconds
+  //       },
+  //       {
+  //         file_date: 'sample_20221226154034.mp3',
+  //         total_duration: 324,    // seconds
+  //         slice_duration: 272,    // seconds
+  //       },
+  //     ]
+  //   },
+  //   {
+  //     order_id: 2,
+  //     delivery: 'regist_cd',   // email, regist(등기), regist_cd(등기+CD)
+  //     notarial: true,    // 공증 여부 true, false,
+  //     price: 57000,
+  //     files : [
+  //       {
+  //         file_date: 'sample_20221226154030.mp3',
+  //         total_duration: 23498,    // seconds
+  //         slice_duration: 3511,    // seconds
+  //       }
+  //     ]
+  //   }
+  // ];
+  // this.name = 'sample';
+  // this.phone = '01011111111';
+  // this.email = 'client@test.com';
+  // this.postcode = 10204;
+  // this.address = '대전시 유성구 대덕대로 512번길 20';
+  // this.totalPrice = this.orderList.reduce((total, val) => total + val.price, 0);
 },
 methods: {
+  msToMin(ms) {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = ((ms % 60000) / 1000).toFixed(0);
+    return (
+      seconds == 60 ?
+      (minutes+1) + ":00" :
+      minutes + ":" + (seconds < 10 ? "0" : "") + seconds
+    );
+  },
   changeMode(val) {
     this.$emit('changeMode', val)
   },
@@ -267,13 +308,39 @@ methods: {
   },
   confirm() {
     const data = {
-      id: this.email,
-      password: this.pw,
+      mail_id: this.email,
       name: this.name,
       phone: this.phone,
-      addr: this.address + ' ' + this.extraAddress,
+      post_code: this.postcode,
+      address: this.address + ' ' + this.extraAddress,
     };
-    console.log(data);
+    const formData = {
+      message: 'steno_order',
+      order_list: [1],
+      order_info: data
+    }
+    console.log('formData', formData);
+    axios({					// axios 통신 시작
+      url: "http://exp.finger.solutions:8200/api/OrderReq/",	// back 서버 주소
+      method: "POST",
+      data: formData,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(res => {				// back 서버로부터 응답받으면
+        console.log(res);
+//         {
+//     "data": [
+//         "\"message\": \"Order success\", \"payment\":25000"
+//     ],
+//     "status": 200,
+//     "statusText": "OK",
+//     "headers": {
+//         "content-length": "53",
+//         "content-type": "application/json"
+//     },
+// }
+    }).catch(err => console.log(err));
   }
 }
 }

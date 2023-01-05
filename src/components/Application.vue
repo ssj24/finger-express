@@ -10,7 +10,7 @@
 			<p>장바구니를 통하여 한번에 결재가 가능합니다.</p>
 		</div>
 	</v-row>
-	<v-row class="form-contents py-16 flex-grow-1">
+	<v-row class="form-contents py-16 mx-0 flex-grow-1">
 		<v-col cols="11" md="9" class="d-flex flex-column">
 			<v-row>
 				<v-col cols="12" lg="4">
@@ -57,7 +57,7 @@
 						>
 							<!-- 파일 업로드 -->
 							<v-row class="px-5">
-								<v-col cols="8" md="6" class="pb-0"
+								<v-col cols="6" md="4" class="pb-0"
 								>
 									<v-file-input
 										v-model="uploadFiles"
@@ -68,10 +68,11 @@
 										@change="uploadHandler"
 										:rules="fileRules"
 										id="fileInput"
+										:clearable=false
 									>
 									</v-file-input>
 								</v-col>
-								<v-col cols="4" offset-md="4" md="2" class="d-flex justify-center align-center mb-4">
+								<v-col cols="4" offset-md="6" md="2" class="d-flex justify-center align-center mb-4">
 									<v-btn
 										width="100%"
 										color="accent"
@@ -81,14 +82,14 @@
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
 									</v-btn>
-									<v-btn
-										width="100%"
+									<!-- <v-btn
+										width="50%"
 										color="accent"
 										outlined
 										@click="tempPreview"
 									>
 										TEMP
-									</v-btn>
+									</v-btn> -->
 								</v-col>
 							</v-row>
 							<v-row>
@@ -99,11 +100,10 @@
 								>
 									<!-- <audio id="audio-preview" controls v-show="file != ''"/> -->
 									<div @click="onFileContainerClicked" @drop="dragFile" class="dragContainer">
-										<v-row v-if="!files.length" class="emptyFileName pa-5  no-gutters">
-											<v-icon left>
-												mdi-music-note-plus
-											</v-icon>
-											파일을 드래그해서 추가해주세요
+										<v-row v-if="!files.length" class="emptyFileName pa-5 no-gutters">
+											<img src="../assets/file_upload.png" alt="file" width="30">
+											<p class="mt-5">파일을 마우스로 끌어서 업로드 가능합니다.</p>
+											<p>여러개를 업로드하면 하나의 문서로 묶어 드립니다.</p>
 										</v-row>
 										<v-row v-else class="pa-5">
 											<v-col cols="12" sm="6" md="4" class="fileName" v-for="(f, i) in files" :key="i" >
@@ -116,6 +116,7 @@
 															{{ f.name }}
 														</p>
 														<p class="text-subtitle-2 mb-0">{{f.sizeInMB}}MB</p>
+														<span class="deleteFile">x</span>
 													</span>
 												</div>
 											</v-col>
@@ -131,7 +132,7 @@
 			</v-row>
 			<v-row class="flex-grow-1">
 				<v-col cols="12">
-					<Sentences :previewText="previewText[currentFile]" :showPreview="preview" @validateClicked="validate"/>
+					<Sentences :previewText="previewText[currentFile]" :fileName="currentFile" :showPreview="preview" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
@@ -179,15 +180,15 @@ export default {
     methods: {
 			getTimeFormat() {
 				function pad(n) { return n<10 ? "0"+n : n }
-					const d=new Date()
-					return `${d.getFullYear()}`.concat(pad(d.getMonth()+1), pad(d.getDate()), pad(d.getDate()), pad(d.getHours()), pad(d.getMinutes()), pad(d.getSeconds()));
+				const d=new Date()
+				return `${d.getFullYear()}`.concat(pad(d.getMonth()+1), pad(d.getDate()), pad(d.getHours()), pad(d.getMinutes()), pad(d.getSeconds()));
 			},
       validate (val) {
 				console.log(val);
         if (this.files.length) {
 					// modifiedVal = val.map(x => x.total_duration = this.previewText[0])
 					this.formData = {
-						message: 'stt_scope',
+						message: 'order_regist',
 						client_mail: this.clientMail,
 						delivery: this.delivery,
 						notarial: this.authentication,
@@ -205,7 +206,7 @@ export default {
 					// console.log(getFormData(this.formData));
 
 					axios({					// axios 통신 시작
-          url: "https://exp.finger.solutions/api/OrderRegist/",	// back 서버 주소
+          url: "http://exp.finger.solutions:8200/api/OrderRegist/ ",	// back 서버 주소
           method: "POST",
 					data: this.formData,
 					headers: {
@@ -296,24 +297,30 @@ export default {
 				// }, new FormData());
 				// console.log(getFormData(this.formData));
 				axios({					// axios 통신 시작
-				url: "https://rest.finger.solutions/api/ReviewStt/",	// back 서버 주소
-				method: "POST",
-				data: this.formData,
-				headers: {
-					'Content-Type': 'multipart/form-data'
-				}
-			}).then(res => {				// back 서버로부터 응답받으면
-					console.log(res);		// back 서버에서 보낸 message 출력
-					this.previewText[res.data[0].file_name] = res.data[0].sentence;
-					// this.serverFileNameList.push(res.data[0].file_name);
-					console.log(this.previewText);
-					for (let t of this.previewText[res.data[0].file_name]) {
-						t.minStart = this.msToMin(t.start);
-						t.minEnd = this.msToMin(t.end);
+					url: "https://rest.finger.solutions/api/ReviewStt/",	// back 서버 주소
+					method: "POST",
+					data: this.formData,
+					headers: {
+						'Content-Type': 'multipart/form-data'
 					}
-					this.preview = true;
-			}).catch(err => console.log(err));
-			}
+				}).then(res => {				// back 서버로부터 응답받으면
+						if (res.statusText === 'OK') { //client_id와 비교 필요
+							for (const filedata of res.data) {
+								this.previewText[filedata.file_name] = filedata.sentence;
+								for (let s of this.previewText[filedata.file_name]) {
+									s.minStart = this.msToMin(s.start);
+									s.minEnd = this.msToMin(s.end);
+								}
+							}
+							// this.serverFileNameList.push(res.data[0].file_name);
+							console.log('this.previewText',this.previewText);
+							const previewKeys = Object.keys(this.previewText);
+							this.currentFile = previewKeys[previewKeys.length -1];
+							console.log('current', this.previewText[this.currentFile]);
+							this.preview = true;
+						}
+				}).catch(err => console.log(err));
+				}
 
 			},
 			tempPreview() {
@@ -649,9 +656,14 @@ export default {
 .emptyFileName {
 	height: 100%;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	border-radius: 10px;
+	p {
+		margin: 0;
+		font-size: 15px;
+	}
 }
 .emptyFileName:hover {
 	border: 5px solid #2195f3;
@@ -664,11 +676,26 @@ export default {
 	flex-basis: 1;
 	border: 1px solid #dfdfdf;
 	border-radius: 10px;
-	background-color: #f8faffb0
+	background-color: #f8faffb0;
+	position: relative;
 }
 .fileItem:hover {
-	background-color: #2195f36c;
-	cursor: url('../assets/delete.png'), auto;
+	background-color: #2195f341;
+	cursor: pointer;
+	.deleteFile {
+		display: block;
+	}
+}
+
+.deleteFile {
+	display: none;
+	position: absolute;
+	right: 20px;
+	top: 10px;
+	font-weight: 900;
+	font-size: 18px;
+	color: #FF605C;
+	text-shadow: 0 0 1px red;
 }
 .plainChip {
 	background: transparent !important;

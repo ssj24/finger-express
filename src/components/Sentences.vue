@@ -15,7 +15,7 @@
           </v-col>
           <p class="mr-5">
             총 길이: {{this.previewText[this.previewText.length-1].minEnd}} |
-            선택 길이: {{this.previewText.length}}
+            선택 길이: {{this.selected.length}}
           </p>
         </v-row>
         <div class="text--primary previewCheckboxes" :id="'previewCheckboxes-'+i" v-for="(text, i) in previewText" :key="i">
@@ -72,43 +72,50 @@
       </v-card-text>
     </div>
     <!-- 하단 버튼 -->
-    <v-row class="d-flex justify-end">
-      <v-col class="d-flex justify-end pr-0">
-        <v-btn
-          plain
-          class="pa-0"
-          @click="reset"
-        >
+    <v-row class="selectBtns d-flex justify-end pt-0">
+      <v-col class="d-flex justify-end pr-0 mr-4">
+        <button class="mr-4 reset" @click="reset">
           <v-img
             alt="reset"
-            class="shrink mr-2"
+            class="shrink"
             contain
             src="../assets/undo-arrow.png"
             transition="scale-transition"
             width="20"
           />
-        </v-btn>
-      </v-col>
-      <v-col cols="4" md="2">
-        <v-btn
-          width="100%"
-          class="mr-4"
-          color="accent"
-          @click="all"
+        </button>
+        <!-- <v-btn
+          outlined
+          class="px-0 py-5"
+          @click="reset"
         >
+          <v-img
+            alt="reset"
+            class="shrink"
+            contain
+            src="../assets/undo-arrow.png"
+            transition="scale-transition"
+            width="20"
+          />
+        </v-btn> -->
+        <button class="mr-4 selectAll" @click="all">
+          <span class="mdi mdi-24px mdi-check-circle"></span>
           전체 선택
-        </v-btn>
+        </button>
       </v-col>
     </v-row>
     <v-row class="justify-center mb-0">
-      <v-btn
+      <!-- <v-btn
         width="80%"
         class="mr-4"
         color="accent"
         @click="validate"
       >
         등록
-      </v-btn>
+      </v-btn> -->
+      <button class="mr-4 mb-5 validateBtn" @click="validate">
+        등록하기
+      </button>
     </v-row>
   </v-row>
 
@@ -119,7 +126,7 @@
 export default {
   name: 'sentencesComponent',
   props: {
-    serverFileNameList: [],
+    fileName: String,
     previewText: [],
     showPreview: Boolean,
   },
@@ -136,6 +143,7 @@ export default {
   watch: {
     showPreview() {
       setTimeout(() => {
+        console.log(this.previewText);
         this.previewCheckboxes = document.querySelectorAll('.previewCheckboxes');
         this.previewCheckboxesArray = Array.from(this.previewCheckboxes);
       }, 500);
@@ -211,31 +219,37 @@ export default {
     },
     all () {
       for (let i=0; i<this.previewText.length; i++) {
-        this.selected.push(i);
-        document.getElementById('previewCheckboxes-'+i).classList.add('borderBlue');
+        if (!this.selected.includes(i)) {
+          this.selected.push(i);
+          document.getElementById('previewCheckboxes-'+i).classList.add('borderBlue');
+        }
       }
     },
     validate () {
       const selectedData = [];
       const scopeData = [];
-      if (this.selected.length === 1 && this.selected[0] === 0) {
-        scopeData.push({ 'start_time': this.previewText[1].start, 'end_time': this.previewText[this.previewText.length-1].end})
-      } else {
-        for (let i = 1; i < this.selected.length; i += 2) {
-          console.log(i);
-          scopeData.push({ 'start_time': this.previewText[this.selected[i-1]].start, 'end_time': this.previewText[this.selected[i]-1].end});
-        }
-        if (this.selected.length % 2) {
-          // console.log(this.previewText[this.selected[this.selected.length-1]])
-          scopeData.push({ 'start_time': this.previewText[this.selected[this.selected.length-1]].start, 'end_time': this.previewText[this.previewText.length-1].end})
-        }
-      }
+      this.selected.sort((a, b) => a - b);
+      console.log(this.selected);
+      // if (this.selected.length === 1 && this.selected[0] === 0) {
+      //   scopeData.push({ 'start_time': this.previewText[1].start, 'end_time': this.previewText[this.previewText.length-1].end})
+      // } else {
+      //   for (let i = 1; i < this.selected.length; i += 2) {
+      //     console.log(i);
+      //     scopeData.push({ 'start_time': this.previewText[this.selected[i-1]].start, 'end_time': this.previewText[this.selected[i]-1].end});
+      //   }
+      //   if (this.selected.length % 2) {
+      //     // console.log(this.previewText[this.selected[this.selected.length-1]])
+      //     scopeData.push({ 'start_time': this.previewText[this.selected[this.selected.length-1]].start, 'end_time': this.previewText[this.previewText.length-1].end})
+      //   }
+      // }
+      scopeData.push({ 'start_time': this.previewText[this.selected[0]].start, 'end_time': this.previewText[this.selected.length-1].end});
       selectedData.push({
-        file_name: this.serverFileNameList[0],
+        file_name: this.fileName,
+        total_duration: this.previewText[this.previewText.length-1].end,
         stt_scope: scopeData
       })
       console.log(selectedData);
-      // this.$emit('validateClicked', selectedData)
+      this.$emit('validateClicked', selectedData)
     },
   }
 }
@@ -243,6 +257,7 @@ export default {
 
 <style>
 .previewContainer {
+  height: auto;
 	max-height: 500px;
 	overflow: auto;
 }
@@ -303,5 +318,30 @@ export default {
 }
 .disabledLabel {
 	pointer-events: none;
+}
+.selectBtns {
+  height: 72px;
+}
+.selectAll,
+.validateBtn {
+  font-size: 15px;
+  color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.validateBtn {
+  background-color: #E4E5ED;
+  color: #9A9BA7;
+  font-size: 18px;
+  font-weight: 900;
+  width: 80%;
+}
+.validateBtn:hover {
+  background-color: #00A3FF;
+  color: white;
 }
 </style>

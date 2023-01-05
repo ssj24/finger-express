@@ -17,11 +17,11 @@ module.exports = defineConfig({
         secure: false,
         pathRewrite: {'^/rest' : ''}
       },
-      '^/scope': {
-        target: 'https://rest.finger.solutions/api/SttScope/',
+      '^/basket': {
+        target: 'http://exp.finger.solutions:8200/api/BasketList/',
         changeOrigin: true,
         secure: false,
-        pathRewrite: {'^/scope' : ''}
+        pathRewrite: {'^/basket' : ''}
       },  
       '^/stt': {
         target: 'https://componer.iptime.org/SttAnalysis/',
