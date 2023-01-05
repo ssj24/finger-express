@@ -175,7 +175,7 @@ export default {
     }
     console.log('formData', formData);
     axios({					// axios 통신 시작
-      url: "http://exp.finger.solutions:8200/api/OrderList/",	// back 서버 주소
+      url: "https://exp.finger.solutions:8200/api/OrderList/",	// back 서버 주소
       method: "POST",
       data: formData,
       headers: {
