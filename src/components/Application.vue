@@ -206,7 +206,7 @@ export default {
 					// console.log(getFormData(this.formData));
 
 					axios({					// axios 통신 시작
-          url: "https://exp.finger.solutions:8200/api/OrderRegist/ ",	// back 서버 주소
+          url: "http://exp.finger.solutions:8200/api/OrderRegist/ ",	// back 서버 주소
           method: "POST",
 					data: this.formData,
 					headers: {
