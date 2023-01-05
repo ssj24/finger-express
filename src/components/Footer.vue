@@ -11,8 +11,9 @@
       >
         <v-card-text class="grey--text text-caption card-row">
           <v-row class="d-flex justify-space-between align-center">
-            <v-col>
-              logo
+            <v-col class="d-flex align-center">
+              <img src="../assets/logo.png" alt="finger.exp logo" width="20" class="mt-n1 mr-1">
+              <img src="../assets/titleW.svg" alt="finger.exp" height="18">
             </v-col>
             <v-col class="d-flex justify-end">
               <v-btn @click="readFile('open')" text color="white" class="py-0 px-2">

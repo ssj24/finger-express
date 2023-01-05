@@ -14,7 +14,7 @@
       ></v-radio>
     </v-radio-group>
 	</v-row>
-	<v-row class="form-contents flex-column align-center py-16 flex-grow-1">
+	<v-row class="form-contents mx-0 flex-column align-center py-16 flex-grow-1">
 		<v-col cols="11" md="6" class="d-flex flex-column" v-for="(x, i) in orderList" :key="x.order_id">
 			<v-card class="pa-5">
         <div class="cardHeader">
@@ -81,7 +81,7 @@
               <v-stepper-content :step="idx">
                 <v-btn
                   color="blue"
-                  @click="x.status = x.status+1"
+                  @click="changeStatus(idx+1, x.order_id)"
                   outlined
                 >
                   완료
@@ -95,17 +95,30 @@
         </div>
       </v-card>
 		</v-col>
+    <v-col v-if="!orderList.length" cols="11" md="6" class="d-flex flex-column">
+      <v-card class="pa-5">
+        <v-card-title class="d-flex justify-center">
+          <span class="text-h6">
+            아직 접수된 주문이 없습니다.
+          </span>
+        </v-card-title>
+      </v-card>
+    </v-col>
 	</v-row>
 	
 </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'AdminComponent',
   data: () => ({
     period: 1,
     periodList: [1, 3, 6],
+    start: '',
+    end: '',
     orderList: [
       {
         client_name: '홍길동',
@@ -148,8 +161,30 @@ export default {
       },
     ],
     statusList: ['초안 작업중', '초안 검토 요청', '최종본 작업중', '발송완료', '수령'],
+    stageList: ['draft', 'review', 'final', 'send', 'receive'],
   }),
   created() {
+    const d=new Date();
+    const priorD = new Date(new Date().setDate(d.getDate() - 30));
+		this.end = `${d.getFullYear()}-${d.getMonth()+1 <10 ? "0"+(d.getMonth()+1) : d.getMonth()+1}-${d.getDate() <10 ? "0"+(d.getDate()) : d.getDate()}`;
+		this.start = `${priorD.getFullYear()}-${priorD.getMonth()+1 <10 ? "0"+(priorD.getMonth()+1) : priorD.getMonth()+1}-${priorD.getDate() <10 ? "0"+(priorD.getDate()) : priorD.getDate()}`;
+    const formData = {
+      message: 'admin_order_list',
+      start_date: this.start,
+      end_date: this.end
+    }
+    console.log('formData', formData);
+    axios({					// axios 통신 시작
+      url: "http://exp.finger.solutions:8200/api/OrderList/",	// back 서버 주소
+      method: "POST",
+      data: formData,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(res => {				// back 서버로부터 응답받으면
+        console.log(res);
+        this.orderList = res.data.order_list;
+    }).catch(err => console.log(err));
     this.orderList.map(x => {
       const statusNum = x.stage === 'draft' ? 0 : x.stage === 'review' ? 1 : x.stage === 'final' ? 2 : x.stage === 'send' ? 3 : 4;
       this.$set(x, 'status', statusNum);
@@ -162,6 +197,22 @@ export default {
       hiddenStatusDiv.classList.toggle('hidden');
     },
     changeStatus(i, orderId) {
+      const formData = {
+        message: 'stage_change_req',
+        order_id: orderId,
+        stage: this.stageList[i]
+      }
+      console.log('formData', formData);
+      axios({					// axios 통신 시작
+        url: "http://exp.finger.solutions:8200/api/StageChange/",	// back 서버 주소
+        method: "POST",
+        data: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {				// back 서버로부터 응답받으면
+          console.log(res);
+      }).catch(err => console.log(err));
       const targetOrder = this.orderList.filter(x => x.order_id === orderId);
       targetOrder[0].status = i;
     }

@@ -142,7 +142,7 @@ export default {
 
 <style lang="scss">
 .v-toolbar__content {
-  border-bottom: 1px solid #e9e9e9;
+  // border-bottom: 1px solid #E7E7E7;
 }
 .appContainer {
   font-family: 'S-CoreDream-3Light',  sans-serif;

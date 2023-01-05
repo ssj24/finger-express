@@ -2,53 +2,39 @@
   <v-card class="d-flex flex-column align-center">
     <v-row class="mb-4 main-row white--text">
       <v-col cols="12" class="text-center">
-        <h2 class="subheading font-weight-regular mb-5">
-          <!-- 온라인 속기 서비스 <br/>
-          증거제출 <br/>
-          녹취록 작성 <br/> -->
-          온라인 속기 서비스 <br />
-          증거제출 
-          녹취록 작성 <br/>
+        <h2 class="subheading font-weight-regular mb-5 px-5">
+          <div class="mr-2">
+            원하는 구간만 무료로
+          </div>
+          <br class="d-none">
+          <div>
+            손쉽게 선택해
+          </div>
+          <br>
+          <div class="titleAccent mr-2">
+            합리적인 가격으로
+          </div>
+          <br class="d-none">
+          <div class="titleAccent">
+            승소를 위한 녹취록
+          </div>
         </h2>
-        <!-- <p>
-          <span>녹취록 의사록 인터뷰 회의록 녹취 공증</span>까지
-          <br />
-          쉽고 빠르게!!!
-          <br />
-          4중 보안장치에
-          <br />다수의 작성 경험과 정확도를 가지고
-          <br />
-          온라인 최저가격으로 제공합니다.
-        </p> -->
-      <h1 class="display-2 font-weight-bold mb-7 py-5 text-center text-uppercase title-banner">
-        Finger Express
+      <h1 class="display-2 font-weight-bold mb-7 py-5 d-inline-block title-banner">
+        finger.exp
       </h1>
       <v-row>
         <v-col
           class="mb-5 d-flex justify-center"
           cols="12"
         >
-          <v-btn
-            x-large
-            width="200px"
-            color="accent"
-            @click="clicked"
-          >신청하기</v-btn>
+          <button class="toApplicationBtn" @click="clicked">
+            신청하기
+          </button>
         </v-col>
       </v-row>
       </v-col>
-      <!-- <v-col cols="12" md="5" class="d-flex flex-column justify-center align-center" data-aos="zoom-out" data-aos-duration="3000">
-        <v-img
-          src="../assets/thunderBig.png"
-          class="shrink"
-          contain
-          width="200px"
-          height="200px"
-        />
-      </v-col> -->
-
     </v-row>
-    
+
     <!-- components -->
     <Process data-aos="fade-up" data-aos-anchor-placement="top-bottom" />
     <Price data-aos="fade-up" data-aos-anchor-placement="center-bottom" />
@@ -188,16 +174,43 @@ export default {
 </script>
 <style lang="scss">
 .main-row {
-  padding: 30px 0;
+  padding: 80px 0;
   width: 100%;
   background-size: contain;
-  background: navy url('/src/assets/home_back.svg') no-repeat center center;
+  background: #152035 url('/src/assets/home_back.svg') no-repeat center center;
+}
+@media only screen and (max-aspect-ratio: 1/1) {
+  .main-row {
+    background-size: cover;
+    background-image: url('/src/assets/home_back_mobile.svg');
+  }
+}
+.subheading {
+  div {
+    width: auto;
+  }
+  div:nth-child(1) {
+    display: inline-block;
+  }
+  div:nth-child(3) {
+    display: inline-block;
+  }
+  div:nth-child(5) {
+    display: inline-block;
+    font-weight: 900;
+  }
+  div:nth-child(7) {
+    display: inline-block;
+    font-weight: 900;
+  }
 }
 .title-banner {
   // background-color: bisque;
-  width: 100%;
   font-size:6rem !important;
   line-height: 5.125rem;
+  background: -webkit-linear-gradient(135deg, #0065F7 0%, #00A5FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .subtitle-col {
 	border-top: 3px double #ff6f00;
@@ -208,5 +221,14 @@ export default {
     font-size: 3rem !important;
     line-height: 3.125rem;
   }
+}
+.toApplicationBtn {
+  font-weight: 900;
+  text-shadow: 0 0 1px white;
+  width: 184px;
+  height: 60px;
+
+  background: linear-gradient(135deg, #00A5FF 0%, #0065F7 100%);
+  border-radius: 28px;
 }
 </style>
