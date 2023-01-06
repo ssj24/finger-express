@@ -82,14 +82,14 @@
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
 									</v-btn>
-									<v-btn
+									<!-- <v-btn
 										width="50%"
 										color="accent"
 										outlined
 										@click="tempPreview"
 									>
 										TEMP
-									</v-btn>
+									</v-btn> -->
 								</v-col>
 							</v-row>
 							<v-row>
