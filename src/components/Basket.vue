@@ -176,7 +176,7 @@ created() {
   }
   console.log('formData', formData);
   axios({					// axios 통신 시작
-    url: "http://exp.finger.solutions:8200/api/BasketList/",	// back 서버 주소
+    url: "https://exp.finger.solutions/api/BasketList/",	// back 서버 주소
     method: "POST",
     data: formData,
     headers: {
@@ -321,7 +321,7 @@ methods: {
     }
     console.log('formData', formData);
     axios({					// axios 통신 시작
-      url: "http://exp.finger.solutions:8200/api/OrderReq/",	// back 서버 주소
+      url: "https://exp.finger.solutions/api/OrderReq/",	// back 서버 주소
       method: "POST",
       data: formData,
       headers: {
