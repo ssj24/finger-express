@@ -216,7 +216,7 @@ export default {
             console.log(res);		// back 서버에서 보낸 message 출력
 						if (res.statusText === 'OK') {
 							this.isComplete = true;
-							this.$emit('changeMode', true);
+							this.$emit('changeMode', 3);
 						}
         }).catch(err => console.log(err));
 				}

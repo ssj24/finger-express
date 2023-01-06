@@ -247,7 +247,7 @@ export default {
         data: formData,
         headers: {
           'Content-Type': 'application/json',
-          // 'Response-Type': 'blob'
+          'Response-Type': 'application/zip'
         }
       }).then(res => {				// back 서버로부터 응답받으면
           console.log(res);

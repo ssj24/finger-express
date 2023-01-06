@@ -127,14 +127,16 @@
 			</v-card>
 		</v-col>
 	</v-row>
-	
+	<order-sucess v-if="isOrderSuccess"></order-sucess>
 </div>
 </template>
 
 <script>
 import axios from 'axios';
+import OrderSucess from './OrderSuccess.vue';
 
 export default {
+  components: { OrderSucess },
 name: 'BasketComponent',
 props: {
   mode: Number,
@@ -167,6 +169,7 @@ data: () => {
     address: postcode ? postcode + ')' + detailAddress : '',
     extraAddress: '',
     valid: true,
+    isOrderSuccess: false,
   }
 },
 created() {
@@ -197,6 +200,7 @@ created() {
         order.sum_total = this.msToMin(order.sum_total);
         order.sum_slice = this.msToMin(order.sum_slice);
       }
+      this.isOrderSuccess = true;
     }
   }).catch(err => console.log(err));
   // this.tempList = [
@@ -265,6 +269,7 @@ methods: {
     );
   },
   changeMode(val) {
+    this.isOrderSuccess = false;
     this.$emit('changeMode', val)
   },
   execDaumPostcode() {
