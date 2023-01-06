@@ -138,6 +138,7 @@ export default {
       checkbox: false,
       previewCheckboxes: NodeList,
       previewCheckboxesArray: [],
+      isAll: false,
     }
   },
   watch: {
@@ -182,19 +183,19 @@ export default {
         this.selected = this.selected.filter(x => x !== i)
       }
       target.classList.toggle('borderBlue')
+      this.isAll = false;
       console.log(this.selected)
     },
     setPeriod() {
       console.log(this.temp)
     },
     onLabelClicked(i, e) {
-      console.log('f', i, this.temp)
       if (this.temp === false) {
         this.temp = i;
         e.target.closest('.previewCheckboxes').classList.add('borderBlue');
         e.target.closest('.previewCheckboxes').classList.add('backBlue');
         this.setPeriod();
-      } else {
+      } else { // 이미 설정된 구간 내부를 클릭했을 때, 클릭한 곳은 f 다음 클릭은 t이면 어디에 맞추지? 
         for (let item=this.temp; item <= i; item++) {
           if (item == this.temp) {
             document.getElementById('previewCheckboxes-'+item).classList.remove('backBlue');
@@ -202,9 +203,14 @@ export default {
           if (!this.selected.includes(item)) {
             this.selected.push(item);
             document.getElementById('previewCheckboxes-'+item).classList.add('borderBlue');
+          } else {
+            this.selected = this.selected.filter(x => x != item);
+            document.getElementById('previewCheckboxes-'+item).classList.remove ('borderBlue');
+
           }
         }
         this.temp = false;
+        this.isAll = false;
         console.log(this.selected);
         }
       // const targetCheckbox = document.getElementById('previewCheck-'+i);
@@ -216,6 +222,7 @@ export default {
         document.getElementById('previewCheckboxes-'+i).classList.remove('borderBlue');
       }
       this.selected = [];
+      this.isAll = false;
     },
     all () {
       for (let i=0; i<this.previewText.length; i++) {
@@ -224,12 +231,37 @@ export default {
           document.getElementById('previewCheckboxes-'+i).classList.add('borderBlue');
         }
       }
+      this.isAll = true; // 전체 선택되었다는 표시가 버튼에 나타나야 함
     },
     validate () {
       const selectedData = [];
       const scopeData = [];
       this.selected.sort((a, b) => a - b);
       console.log(this.selected);
+      let tempStart = this.previewText[this.selected[0]].start;
+      let temp = this.selected[0];
+      if (this.isAll) {
+        scopeData.push({ 'start_time': this.previewText[1].start, 'end_time': this.previewText[this.previewText.length-1].end});
+      } else {
+        for (let i=0; i<this.selected.length; i++) {
+          if (temp == this.selected[i]) {
+            console.log('temp == this.selected[i]', i);
+            temp++
+          } else {
+            console.log('temp != this.selected.length', i);
+            console.log('push', this.selected[i-1])
+            scopeData.push({ 'start_time': tempStart, 'end_time': this.previewText[this.selected[i-1]].end});
+            tempStart = this.previewText[this.selected[i]].start;
+            temp = this.selected[i];
+          }
+          if (temp == this.selected[this.selected.length-1]) {
+            console.log('temp == this.selected.length', i);
+            scopeData.push({ 'start_time': tempStart, 'end_time': this.previewText[this.selected[i]].end});
+            console.log('push', this.selected[i])
+          } 
+        }
+      }
+
       // if (this.selected.length === 1 && this.selected[0] === 0) {
       //   scopeData.push({ 'start_time': this.previewText[1].start, 'end_time': this.previewText[this.previewText.length-1].end})
       // } else {
@@ -242,7 +274,8 @@ export default {
       //     scopeData.push({ 'start_time': this.previewText[this.selected[this.selected.length-1]].start, 'end_time': this.previewText[this.previewText.length-1].end})
       //   }
       // }
-      scopeData.push({ 'start_time': this.previewText[this.selected[0]].start, 'end_time': this.previewText[this.selected.length-1].end});
+
+      // scopeData.push({ 'start_time': this.previewText[this.selected[0]].start, 'end_time': this.previewText[this.selected[this.selected.length-1]].end});
       selectedData.push({
         file_name: this.fileName,
         total_duration: this.previewText[this.previewText.length-1].end,

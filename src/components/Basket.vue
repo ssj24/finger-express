@@ -316,7 +316,7 @@ methods: {
     };
     const formData = {
       message: 'steno_order',
-      order_list: [1],
+      order_list: [this.orderList[this.orderList.length-1].order_id],
       order_info: data
     }
     console.log('formData', formData);
