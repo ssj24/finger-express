@@ -245,14 +245,14 @@ export default {
         url: "https://exp.finger.solutions/api/WorksDown/",	// back 서버 주소
         method: "POST",
         data: formData,
+        responseType: 'blob',
         headers: {
           'Content-Type': 'application/json',
-          'Response-Type': 'application/zip'
         }
       }).then(res => {				// back 서버로부터 응답받으면
           console.log(res);
           // 다운로드(서버에서 전달 받은 데이터) 받은 바이너리 데이터를 blob으로 변환합니다.
-          const blob = new Blob([res.data.file]);
+          const blob = new Blob([res.data], {type: 'application/zip'});
           // 특정 타입을 정의해야 경우에는 옵션을 사용해 MIME 유형을 정의 할 수 있습니다.
           // const blob = new Blob([this.content], {type: 'text/plain'})
 
@@ -266,7 +266,7 @@ export default {
 
           // 다운로드 파일 이름을 지정 할 수 있습니다.
           // 일반적으로 서버에서 전달해준 파일 이름은 응답 Header의 Content-Disposition에 설정됩니다.
-          link.download = res.data.file;
+          link.download = 'file';
 
           // 다운로드 파일 이름을 추출하는 함수
           // const extractDownloadFilename = (response) => {
