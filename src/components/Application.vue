@@ -8,6 +8,8 @@
 			<p>녹취록은 현재 화면에 업로드하신 모든 파일들을 하나의 녹취록 문서로 묶어서 드립니다.</p>
 			<p>서로 다른 문서로 작업이 필요하신 경우, 신청을 별도로 해 주세요.</p>
 			<p>장바구니를 통하여 한번에 결재가 가능합니다.</p>
+			<br>
+			<p style="font-weight: 900px; font-size: 17px;">기본(5분 이내) 30,000 추가 분당 5,000</p>
 		</div>
 	</v-row>
 	<v-row class="form-contents py-16 mx-0 flex-grow-1">
@@ -92,7 +94,9 @@
 									</v-btn> -->
 								</v-col>
 							</v-row>
-							<v-row>
+							<Loading v-if="isLoading"/>
+
+							<v-row v-else>
 								<v-col cols="12"
 									@dragover.prevent
 									@drop.prevent
@@ -130,9 +134,11 @@
 					</v-card>
 				</v-col>
 			</v-row>
+
 			<v-row class="flex-grow-1">
 				<v-col cols="12">
-					<Sentences :previewText="previewText[currentFile]" :fileName="currentFile" :showPreview="preview" @validateClicked="validate"/>
+					<Loading v-if="isComplete"/>
+					<Sentences v-else :previewText="previewText[currentFile]" :fileName="currentFile" :showPreview="preview" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
@@ -144,13 +150,14 @@
 </template>
 
 <script>
+import Loading from './Loading.vue';
 import Payment from './Payment.vue';
 import Sentences from './Sentences.vue';
-import axios from 'axios';
 
 export default {
     name: 'applicationComponent',
     components: {
+			Loading,
       Payment,
 			Sentences,
     },
@@ -173,6 +180,7 @@ export default {
 				preview: false,
 				previewText,
 				currentFile,
+				isLoading: false,
 				isComplete: false,
 				formData: {},
 			}
@@ -185,6 +193,7 @@ export default {
 			},
       validate (val) {
 				console.log(val);
+				this.isComplete = true;
         if (this.files.length) {
 					// modifiedVal = val.map(x => x.total_duration = this.previewText[0])
 					this.formData = {
@@ -205,7 +214,7 @@ export default {
 					// }, new FormData());
 					// console.log(getFormData(this.formData));
 
-					axios({					// axios 통신 시작
+					this.$http({					// axios 통신 시작
           url: "https://exp.finger.solutions/api/OrderRegist/ ",	// back 서버 주소
           method: "POST",
 					data: this.formData,
@@ -215,8 +224,9 @@ export default {
         }).then(res => {				// back 서버로부터 응답받으면
             console.log(res);		// back 서버에서 보낸 message 출력
 						if (res.statusText === 'OK') {
-							this.isComplete = true;
+							this.isComplete = false;
 							this.$emit('changeMode', 3);
+
 						}
         }).catch(err => console.log(err));
 				}
@@ -277,6 +287,8 @@ export default {
 				);
 			},
 			showPreview() {
+				this.isLoading = true;
+
 				if (this.files.length) {
 				const timeFormat = this.getTimeFormat();
 				this.formData = {
@@ -296,7 +308,7 @@ export default {
 				// 	return fd
 				// }, new FormData());
 				// console.log(getFormData(this.formData));
-				axios({					// axios 통신 시작
+				this.$http({					// axios 통신 시작
 					url: "https://rest.finger.solutions/api/ReviewStt/",	// back 서버 주소
 					method: "POST",
 					data: this.formData,
@@ -317,6 +329,8 @@ export default {
 							this.currentFile = previewKeys[previewKeys.length -1];
 							console.log('current', this.previewText[this.currentFile]);
 							this.preview = true;
+							this.isLoading = false;
+
 						}
 				}).catch(err => console.log(err));
 				}

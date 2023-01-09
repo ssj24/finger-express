@@ -5,7 +5,8 @@
 			장바구니
 		</h1>
 	</v-row>
-	<v-row class="form-contents mx-0 py-16 flex-grow-1">
+  <Loading v-if="isLoading"/>
+	<v-row v-else class="form-contents mx-0 py-16 flex-grow-1">
 		<v-col cols="11" md="6" class="d-flex flex-column">
       <v-card class="pa-5"  v-for="(order, i) in orderList" :key="i">
         <v-card-title class="pl-0">
@@ -126,17 +127,18 @@
 				</v-col>
 			</v-card>
 		</v-col>
+
 	</v-row>
-	<order-sucess v-if="isOrderSuccess"></order-sucess>
 </div>
 </template>
 
 <script>
-import axios from 'axios';
-import OrderSucess from './OrderSuccess.vue';
+import Loading from './Loading.vue';
 
 export default {
-  components: { OrderSucess },
+components: {
+  Loading,
+},
 name: 'BasketComponent',
 props: {
   mode: Number,
@@ -147,6 +149,7 @@ data: () => {
   let postcode = '';
   let detailAddress = '';
   return {
+    isLoading: true,
     client_mail: 'client@test.com',
     orderList: [],
     totalPrice: 0,
@@ -169,7 +172,6 @@ data: () => {
     address: postcode ? postcode + ')' + detailAddress : '',
     extraAddress: '',
     valid: true,
-    isOrderSuccess: false,
   }
 },
 created() {
@@ -178,7 +180,7 @@ created() {
     client_mail: this.client_mail
   }
   console.log('formData', formData);
-  axios({					// axios 통신 시작
+  this.$http({					// axios 통신 시작
     url: "https://exp.finger.solutions/api/BasketList/",	// back 서버 주소
     method: "POST",
     data: formData,
@@ -200,7 +202,7 @@ created() {
         order.sum_total = this.msToMin(order.sum_total);
         order.sum_slice = this.msToMin(order.sum_slice);
       }
-      this.isOrderSuccess = true;
+      this.isLoading = false;
     }
   }).catch(err => console.log(err));
   // this.tempList = [
@@ -269,7 +271,6 @@ methods: {
     );
   },
   changeMode(val) {
-    this.isOrderSuccess = false;
     this.$emit('changeMode', val)
   },
   execDaumPostcode() {
@@ -325,7 +326,7 @@ methods: {
       order_info: data
     }
     console.log('formData', formData);
-    axios({					// axios 통신 시작
+    this.$http({					// axios 통신 시작
       url: "https://exp.finger.solutions/api/OrderReq/",	// back 서버 주소
       method: "POST",
       data: formData,
@@ -334,6 +335,9 @@ methods: {
       }
     }).then(res => {				// back 서버로부터 응답받으면
         console.log(res);
+        this.isLoading = false;
+        this.changeMode(4);
+
 //         {
 //     "data": [
 //         "\"message\": \"Order success\", \"payment\":25000"

@@ -14,7 +14,8 @@
       ></v-radio>
     </v-radio-group>
 	</v-row>
-	<v-row class="form-contents mx-0 flex-column align-center py-16 flex-grow-1">
+  <Loading v-if="isLoading" />
+	<v-row v-else class="form-contents mx-0 flex-column align-center py-16 flex-grow-1">
 		<v-col cols="11" md="6" class="d-flex flex-column justify-center align-center" v-for="(x, i) in orderList" :key="x.order_id">
 			<v-card class="pa-5"
         max-width="600px"
@@ -110,16 +111,19 @@
       </v-card>
     </v-col>
 	</v-row>
-	
 </div>
 </template>
 
 <script>
-import axios from 'axios';
+import Loading from './Loading.vue';
 
 export default {
+  components: {
+    Loading,
+  },
   name: 'AdminComponent',
   data: () => ({
+    isLoading: true,
     period: 1,
     periodList: [1, 3, 6],
     start: '',
@@ -138,7 +142,20 @@ export default {
         status: 0,
         total_duration: 324,    // seconds
         slice_duration: 272,    // seconds
-        files : [ 'sample_20221226154030.mp3','sample_20221226154031.mp3','sample_20221226154032.mp3',]
+        files : [
+            {
+                "file_name": "정확도 측정용 샘플(교육)_20230109092358.MP3",
+                "total_duration": 312891,
+                "slice_duration": 7980,
+                "price": 42000
+            },
+            {
+                "file_name": "정확도 측정용 샘플(교육)2_20230109092358.MP3",
+                "total_duration": 312891,
+                "slice_duration": 7980,
+                "price": 42000
+            },
+        ]
       },
       {
         client_name: '홍길동2',
@@ -153,7 +170,14 @@ export default {
         status: 1,
         total_duration: 3234,    // seconds
         slice_duration: 272,    // seconds
-        files : [ 'sample_20221226154030.mp3']
+        files : [
+          {
+                "file_name": "샘플_20230109092358.MP3",
+                "total_duration": 31291,
+                "slice_duration": 7980,
+                "price": 25000
+            },
+        ]
       },
       {
         client_name: '홍길동3',
@@ -168,7 +192,14 @@ export default {
         status: 5,
         total_duration: 1324,    // seconds
         slice_duration: 1272,    // seconds
-        files : [ 'sample_20221226154030.mp3','sample_20221226154031.mp3','sample_20221226154032.mp3',]
+        files : [
+          {
+                "file_name": "정확도_20230109092358.MP3",
+                "total_duration": 11191,
+                "slice_duration": 2380,
+                "price": 25000
+            },
+        ]
       },
     ],
     statusList: ['결제 완료', '초안 작업중', '초안 검토 요청', '최종본 작업중', '발송완료', '수령'],
@@ -185,7 +216,7 @@ export default {
       end_date: this.end
     }
     console.log('formData', formData);
-    axios({					// axios 통신 시작
+    this.$http({					// axios 통신 시작
       url: "https://exp.finger.solutions/api/OrderList/",	// back 서버 주소
       method: "POST",
       data: formData,
@@ -206,6 +237,7 @@ export default {
           this.$set(x, 'status', statusNum);
           x.deliveryOption = x.delivery === 'email' ? '이메일' : x.delivery === "regist" ? '등기' : '등기 + CD';
         })
+        this.isLoading = false;
     }).catch(err => console.log(err));
     
     console.log(this.orderList)
@@ -231,7 +263,7 @@ export default {
         stage: this.stageList[i]
       }
       console.log('formData', formData);
-      axios({					// axios 통신 시작
+      this.$http({					// axios 통신 시작
         url: "https://exp.finger.solutions/api/StageChange/",	// back 서버 주소
         method: "POST",
         data: formData,
@@ -253,7 +285,7 @@ export default {
       }
       console.log('formData', formData);
       const target = this.orderList.find(o => o.order_id === orderId);
-      axios({					// axios 통신 시작
+      this.$http({					// axios 통신 시작
         url: "https://exp.finger.solutions/api/WorksDown/",	// back 서버 주소
         method: "POST",
         data: formData,

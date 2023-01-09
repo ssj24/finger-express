@@ -40,7 +40,7 @@
       <!-- <v-btn class="white--text font-weight mr-2" outlined >장바구니</v-btn> -->
       <v-btn class="white--text font-weight mr-2" outlined v-if="this.$store.state.isLogin">마이페이지</v-btn>
       <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(3)">장바구니</v-btn>
-      <!-- <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn> -->
+      <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn>
       <v-btn class="white--text font-weight mr-2" outlined @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
     </v-app-bar>
 
@@ -63,6 +63,11 @@
         :mode="mode"
         @changeMode="modeChanged"
       />
+      <order-success
+        v-if="mode === 4"
+        :mode="mode"
+        @changeMode="modeChanged"
+      />
     </v-main>
     <v-main class="d-flex justify-center align-center" v-else-if="toSignIn">
       <Sign-up />
@@ -76,6 +81,7 @@ import Admin from './components/Admin.vue';
 import Home from './components/Home.vue';
 import Application from './components/Application.vue';
 import Basket from './components/Basket.vue';
+import OrderSuccess from './components/OrderSuccess.vue';
 import SignUp from './components/Signup.vue';
 import Footer from './components/Footer.vue';
 
@@ -87,6 +93,7 @@ export default {
     Home,
     Application,
     Basket,
+    OrderSuccess,
     SignUp,
     Footer,
   },
@@ -131,7 +138,6 @@ export default {
     signIn() {
       this.toSignIn = true;
     },
-    
     logout() {
       window.location.reload();
       this.$store.commit('LOGGED_OUT');
