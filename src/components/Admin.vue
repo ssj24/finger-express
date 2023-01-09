@@ -40,18 +40,18 @@
           </v-row>
           <v-card-title class="pl-0">
             <span class="text-h5">
-              {{x.files[0].slice(0, -4)}} {{x.files.length>1 ? `외 ${x.files.length-1}건` : ''}} 
+              {{x.files[0].file_name.slice(0, -4)}} {{x.files.length>1 ? `외 ${x.files.length-1}건` : ''}} 
             </span>
             <span class="timeTotal">
               <img src="../assets/clock.png" alt="시계" width="15" />
-              <p class="mb-0 ml-1">{{x.total_duration}}</p>
+              <p class="mb-0 ml-1">{{x.totalM}}</p>
             </span>
           </v-card-title>
         </div>
         <table class="cardContents mb-5">
           <tr>
             <td>요청길이</td>
-            <td>{{x.slice_duration}}</td>
+            <td>{{x.sliceM}}</td>
           </tr>
           <tr>
             <td>옵션</td>
@@ -177,7 +177,7 @@ export default {
   created() {
     const d=new Date();
     const priorD = new Date(new Date().setDate(d.getDate() - 30));
-		this.end = `${d.getFullYear()}-${d.getMonth()+1 <10 ? "0"+(d.getMonth()+1) : d.getMonth()+1}-${d.getDate() <10 ? "0"+(d.getDate()+1) : d.getDate()+1}`;
+		this.end = `${d.getFullYear()}-${d.getMonth()+1 <10 ? "0"+(d.getMonth()+1) : d.getMonth()+1}-${d.getDate() < 9 ? "0"+(d.getDate() + 1) : d.getDate() + 1}`;
 		this.start = `${priorD.getFullYear()}-${priorD.getMonth()+1 <10 ? "0"+(priorD.getMonth()+1) : priorD.getMonth()+1}-${priorD.getDate() <10 ? "0"+(priorD.getDate()) : priorD.getDate()}`;
     const formData = {
       message: 'admin_order_list',
@@ -195,10 +195,12 @@ export default {
     }).then(res => {				// back 서버로부터 응답받으면
         console.log(res);
         this.orderList = res.data.order_list;
-        // for (const order of this.orderList) {
-          // console.log(JSON.parse(order.files))
-          // order.files = JSON.parse(order.files);
-        // }
+        for (const order of this.orderList) {
+          order.files = JSON.parse(order.files.replace(/'/g, '"'));
+          order.totalM = this.msToMin(order.sum_total);
+          order.sliceM = this.msToMin(order.sum_slice);
+        }
+        console.log(this.orderList)
         this.orderList.map(x => {
           const statusNum = x.stage === 'paid' ? 0 : x.stage === 'draft' ? 1 : x.stage === 'review' ? 2 : x.stage === 'final' ? 3 : x.stage === 'send' ? 4 : 5;
           this.$set(x, 'status', statusNum);
@@ -209,6 +211,15 @@ export default {
     console.log(this.orderList)
   },
   methods: {
+    msToMin(ms) {
+      const minutes = Math.floor(ms / 60000);
+      const seconds = ((ms % 60000) / 1000).toFixed(0);
+      return (
+        seconds == 60 ?
+        (minutes+1) + ":00" :
+        minutes + ":" + (seconds < 10 ? "0" : "") + seconds
+      );
+    },
     openStatus(i) {
       const hiddenStatusDiv = document.getElementById(`hiddenStatus${i}`);
       hiddenStatusDiv.classList.toggle('hidden');
@@ -241,6 +252,7 @@ export default {
         order_id: orderId,
       }
       console.log('formData', formData);
+      const target = this.orderList.find(o => o.order_id === orderId);
       axios({					// axios 통신 시작
         url: "https://exp.finger.solutions/api/WorksDown/",	// back 서버 주소
         method: "POST",
@@ -266,7 +278,7 @@ export default {
 
           // 다운로드 파일 이름을 지정 할 수 있습니다.
           // 일반적으로 서버에서 전달해준 파일 이름은 응답 Header의 Content-Disposition에 설정됩니다.
-          link.download = 'file';
+          link.download = target.files[0].file_name.slice(0, -4);
 
           // 다운로드 파일 이름을 추출하는 함수
           // const extractDownloadFilename = (response) => {
@@ -278,9 +290,6 @@ export default {
           //     );
           //     return fileName;
           // };
-
-          // 다운로드 파일의 이름은 직접 지정 할 수 있습니다.
-          // link.download = "sample-file.xlsx";
 
           // 링크를 body에 추가하고 강제로 click 이벤트를 발생시켜 파일 다운로드를 실행시킵니다.
           document.body.appendChild(link);

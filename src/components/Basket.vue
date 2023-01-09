@@ -195,7 +195,7 @@ created() {
       this.address = res.data.order_info.address; // 상세주소와 나눠서 저장..? || 프론트에서 상세주소를 따로 없이..?
       this.orderList = res.data.order_info.order_list;
       for (const order of this.orderList) {
-        // order.files = JSON.parse(order.files);
+        order.files = JSON.parse(order.files.replace(/'/g, '"'));
         this.totalPrice += order.sum_price;
         order.sum_total = this.msToMin(order.sum_total);
         order.sum_slice = this.msToMin(order.sum_slice);
