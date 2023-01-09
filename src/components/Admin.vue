@@ -15,23 +15,28 @@
     </v-radio-group>
 	</v-row>
 	<v-row class="form-contents mx-0 flex-column align-center py-16 flex-grow-1">
-		<v-col cols="11" md="6" class="d-flex flex-column" v-for="(x, i) in orderList" :key="x.order_id">
-			<v-card class="pa-5">
+		<v-col cols="11" md="6" class="d-flex flex-column justify-center align-center" v-for="(x, i) in orderList" :key="x.order_id">
+			<v-card class="pa-5"
+        max-width="600px"
+      >
         <div class="cardHeader">
-          <v-row class="justify-space-between align-center">
-            <v-card-subtitle class="d-flex flex-wrap">
-              <p class="mr-5 mb-0">
-                주문일: {{x.order_at}}
-              </p>
-              <p class="mb-0">
-                주문자: {{x.client_name}}({{x.phone}})
-              </p>
-            </v-card-subtitle>
-
-            <v-btn outlined class="downloadBtn mr-5" @click="download(x.order_id)">
-              다운로드
-              <span class="mdi mdi-download"></span>
-            </v-btn>
+          <v-row class="align-center">
+            <v-col>
+              <v-card-subtitle class="d-flex flex-wrap pa-0">
+                <p class="mr-5 mb-0">
+                  주문일: {{new Date(x.order_at).toLocaleString('ko-KR')}}
+                </p>
+                <p class="mb-0">
+                  주문자: {{x.client_name}}({{x.phone}})
+                </p>
+              </v-card-subtitle>
+            </v-col>
+            <v-col cols="12" md="4" class="d-flex justify-end" order="first" order-md="last">
+              <v-btn outlined class="downloadBtn" @click="download(x.order_id)">
+                다운로드
+                <span class="mdi mdi-download"></span>
+              </v-btn>
+            </v-col>
           </v-row>
           <v-card-title class="pl-0">
             <span class="text-h5">
@@ -50,7 +55,7 @@
           </tr>
           <tr>
             <td>옵션</td>
-            <td>{{x.deliveryOption.concat(x.notarial ? ', 공증' : '')}}</td>
+            <td>{{x.deliveryOption.concat(x.notarial === 'False' ? '' : ', 공증')}}</td>
           </tr>
         </table>
         <hr>
@@ -72,21 +77,21 @@
               :key="statusStep">
               <v-stepper-step
                 :step="idx"
-                :complete="idx<=x.status"
+                :complete="idx - 1<=x.status"
                 color="blue"
               >
                 {{statusStep}}
               </v-stepper-step>
 
-              <v-stepper-content :step="idx">
+              <v-stepper-content :step="idx -1">
                 <v-btn
                   color="blue"
-                  @click="changeStatus(idx+1, x.order_id)"
+                  @click="changeStatus(idx, x.order_id)"
                   outlined
                 >
                   완료
                 </v-btn>
-                <v-btn text @click="changeStatus(idx-1, x.order_id)">
+                <v-btn text @click="changeStatus(idx-2, x.order_id)">
                   취소
                 </v-btn>
               </v-stepper-content>
@@ -127,8 +132,10 @@ export default {
         order_at: '2022-08-24',
         order_id: 0,
         delivery: 'email',   // email, regist(등기), regist_cd(등기+CD)
-        notarial: false,    // 공증 여부 true, false
-        stage: 'draft',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+        deliveryOption: '이메일',   // email, regist(등기), regist_cd(등기+CD)
+        notarial: 'False',    // 공증 여부 true, false
+        stage: 'draft',    // paid, draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+        status: 0,
         total_duration: 324,    // seconds
         slice_duration: 272,    // seconds
         files : [ 'sample_20221226154030.mp3','sample_20221226154031.mp3','sample_20221226154032.mp3',]
@@ -140,8 +147,10 @@ export default {
         order_at: '2022-08-24',
         order_id: 1,
         delivery: 'regist',   // email, regist(등기), regist_cd(등기+CD)
-        notarial: false,    // 공증 여부 true, false
+        deliveryOption: '등기',   // email, regist(등기), regist_cd(등기+CD)
+        notarial: 'False',    // 공증 여부 true, false
         stage: 'review',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+        status: 1,
         total_duration: 3234,    // seconds
         slice_duration: 272,    // seconds
         files : [ 'sample_20221226154030.mp3']
@@ -153,20 +162,22 @@ export default {
         order_at: '2022-08-24',
         order_id: 2,
         delivery: 'regist_cd',   // email, regist(등기), regist_cd(등기+CD)
-        notarial: true,    // 공증 여부 true, false
+        deliveryOption: '등기+CD',   // email, regist(등기), regist_cd(등기+CD)
+        notarial: 'True',    // 공증 여부 true, false
         stage: 'receive',    // draft(초안), review(검토), final(최종본),  send(발송, receive(수령)
+        status: 5,
         total_duration: 1324,    // seconds
         slice_duration: 1272,    // seconds
         files : [ 'sample_20221226154030.mp3','sample_20221226154031.mp3','sample_20221226154032.mp3',]
       },
     ],
-    statusList: ['초안 작업중', '초안 검토 요청', '최종본 작업중', '발송완료', '수령'],
-    stageList: ['draft', 'review', 'final', 'send', 'receive'],
+    statusList: ['결제 완료', '초안 작업중', '초안 검토 요청', '최종본 작업중', '발송완료', '수령'],
+    stageList: ['paid', 'draft', 'review', 'final', 'send', 'receive'],
   }),
   created() {
     const d=new Date();
     const priorD = new Date(new Date().setDate(d.getDate() - 30));
-		this.end = `${d.getFullYear()}-${d.getMonth()+1 <10 ? "0"+(d.getMonth()+1) : d.getMonth()+1}-${d.getDate() <10 ? "0"+(d.getDate()) : d.getDate()}`;
+		this.end = `${d.getFullYear()}-${d.getMonth()+1 <10 ? "0"+(d.getMonth()+1) : d.getMonth()+1}-${d.getDate() <10 ? "0"+(d.getDate()+1) : d.getDate()+1}`;
 		this.start = `${priorD.getFullYear()}-${priorD.getMonth()+1 <10 ? "0"+(priorD.getMonth()+1) : priorD.getMonth()+1}-${priorD.getDate() <10 ? "0"+(priorD.getDate()) : priorD.getDate()}`;
     const formData = {
       message: 'admin_order_list',
@@ -175,7 +186,7 @@ export default {
     }
     console.log('formData', formData);
     axios({					// axios 통신 시작
-      url: "https://exp.finger.solutions:8200/api/OrderList/",	// back 서버 주소
+      url: "https://exp.finger.solutions/api/OrderList/",	// back 서버 주소
       method: "POST",
       data: formData,
       headers: {
@@ -184,12 +195,18 @@ export default {
     }).then(res => {				// back 서버로부터 응답받으면
         console.log(res);
         this.orderList = res.data.order_list;
+        // for (const order of this.orderList) {
+          // console.log(JSON.parse(order.files))
+          // order.files = JSON.parse(order.files);
+        // }
+        this.orderList.map(x => {
+          const statusNum = x.stage === 'paid' ? 0 : x.stage === 'draft' ? 1 : x.stage === 'review' ? 2 : x.stage === 'final' ? 3 : x.stage === 'send' ? 4 : 5;
+          this.$set(x, 'status', statusNum);
+          x.deliveryOption = x.delivery === 'email' ? '이메일' : x.delivery === "regist" ? '등기' : '등기 + CD';
+        })
     }).catch(err => console.log(err));
-    this.orderList.map(x => {
-      const statusNum = x.stage === 'draft' ? 0 : x.stage === 'review' ? 1 : x.stage === 'final' ? 2 : x.stage === 'send' ? 3 : 4;
-      this.$set(x, 'status', statusNum);
-      x.deliveryOption = x.delivery === 'email' ? '이메일' : x.delivery === "regist" ? '등기' : '등기 + CD';
-    })
+    
+    console.log(this.orderList)
   },
   methods: {
     openStatus(i) {
@@ -204,7 +221,7 @@ export default {
       }
       console.log('formData', formData);
       axios({					// axios 통신 시작
-        url: "http://exp.finger.solutions:8200/api/StageChange/",	// back 서버 주소
+        url: "https://exp.finger.solutions/api/StageChange/",	// back 서버 주소
         method: "POST",
         data: formData,
         headers: {
@@ -212,9 +229,67 @@ export default {
         }
       }).then(res => {				// back 서버로부터 응답받으면
           console.log(res);
+          if (res.data.message === 'success') {
+            const targetOrder = this.orderList.filter(x => x.order_id === orderId);
+            targetOrder[0].status = i;
+          }
       }).catch(err => console.log(err));
-      const targetOrder = this.orderList.filter(x => x.order_id === orderId);
-      targetOrder[0].status = i;
+    },
+    download(orderId) {
+      const formData = {
+        message: 'work_down_req',
+        order_id: orderId,
+      }
+      console.log('formData', formData);
+      axios({					// axios 통신 시작
+        url: "https://exp.finger.solutions/api/WorksDown/",	// back 서버 주소
+        method: "POST",
+        data: formData,
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }).then(res => {				// back 서버로부터 응답받으면
+          console.log(res);
+          // 다운로드(서버에서 전달 받은 데이터) 받은 바이너리 데이터를 blob으로 변환합니다.
+          const blob = new Blob([res.data], {type: 'application/zip'});
+          // 특정 타입을 정의해야 경우에는 옵션을 사용해 MIME 유형을 정의 할 수 있습니다.
+          // const blob = new Blob([this.content], {type: 'text/plain'})
+
+          // blob을 사용해 객체 URL을 생성합니다.
+          const fileObjectUrl = window.URL.createObjectURL(blob);
+
+          // blob 객체 URL을 설정할 링크를 만듭니다.
+          const link = document.createElement("a");
+          link.href = fileObjectUrl;
+          link.style.display = "none";
+
+          // 다운로드 파일 이름을 지정 할 수 있습니다.
+          // 일반적으로 서버에서 전달해준 파일 이름은 응답 Header의 Content-Disposition에 설정됩니다.
+          link.download = 'file';
+
+          // 다운로드 파일 이름을 추출하는 함수
+          // const extractDownloadFilename = (response) => {
+          //     const disposition = response.headers["content-disposition"];
+          //     const fileName = decodeURI(
+          //     disposition
+          //         .match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1]
+          //         .replace(/['"]/g, "")
+          //     );
+          //     return fileName;
+          // };
+
+          // 다운로드 파일의 이름은 직접 지정 할 수 있습니다.
+          // link.download = "sample-file.xlsx";
+
+          // 링크를 body에 추가하고 강제로 click 이벤트를 발생시켜 파일 다운로드를 실행시킵니다.
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+
+          // 다운로드가 끝난 리소스(객체 URL)를 해제합니다.
+          window.URL.revokeObjectURL(fileObjectUrl);
+      }).catch(err => console.log(err));
     }
   }
 }

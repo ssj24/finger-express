@@ -127,14 +127,16 @@
 			</v-card>
 		</v-col>
 	</v-row>
-	
+	<order-sucess v-if="isOrderSuccess"></order-sucess>
 </div>
 </template>
 
 <script>
 import axios from 'axios';
+import OrderSucess from './OrderSuccess.vue';
 
 export default {
+  components: { OrderSucess },
 name: 'BasketComponent',
 props: {
   mode: Number,
@@ -167,6 +169,7 @@ data: () => {
     address: postcode ? postcode + ')' + detailAddress : '',
     extraAddress: '',
     valid: true,
+    isOrderSuccess: false,
   }
 },
 created() {
@@ -176,7 +179,7 @@ created() {
   }
   console.log('formData', formData);
   axios({					// axios 통신 시작
-    url: "https://exp.finger.solutions:8200/api/BasketList/",	// back 서버 주소
+    url: "https://exp.finger.solutions/api/BasketList/",	// back 서버 주소
     method: "POST",
     data: formData,
     headers: {
@@ -197,6 +200,7 @@ created() {
         order.sum_total = this.msToMin(order.sum_total);
         order.sum_slice = this.msToMin(order.sum_slice);
       }
+      this.isOrderSuccess = true;
     }
   }).catch(err => console.log(err));
   // this.tempList = [
@@ -265,6 +269,7 @@ methods: {
     );
   },
   changeMode(val) {
+    this.isOrderSuccess = false;
     this.$emit('changeMode', val)
   },
   execDaumPostcode() {
@@ -316,12 +321,12 @@ methods: {
     };
     const formData = {
       message: 'steno_order',
-      order_list: [1],
+      order_list: [this.orderList[this.orderList.length-1].order_id],
       order_info: data
     }
     console.log('formData', formData);
     axios({					// axios 통신 시작
-      url: "https://exp.finger.solutions:8200/api/OrderReq/",	// back 서버 주소
+      url: "https://exp.finger.solutions/api/OrderReq/",	// back 서버 주소
       method: "POST",
       data: formData,
       headers: {
