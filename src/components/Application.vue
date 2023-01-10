@@ -9,7 +9,7 @@
 			<p>서로 다른 문서로 작업이 필요하신 경우, 신청을 별도로 해 주세요.</p>
 			<p>장바구니를 통하여 한번에 결재가 가능합니다.</p>
 			<br>
-			<p style="font-weight: 900px; font-size: 17px;">기본(5분 이내) 30,000 추가 분당 5,000</p>
+			<p style="font-weight: 900; font-size: 17px;">기본(5분 이내) 30,000 추가 분당 5,000</p>
 		</div>
 	</v-row>
 	<v-row class="form-contents py-16 mx-0 flex-grow-1">
@@ -51,7 +51,7 @@
 							파일 첨부
 						</v-card-title>
 						<v-card-subtitle>
-							하나당 최대 ??MB의 파일을 10개까지 첨부하실 수 있습니다.
+							하나당 최대 100MB의 파일을 10개까지 첨부하실 수 있습니다.
 						</v-card-subtitle>
 						<v-form
 							ref="form"
@@ -309,7 +309,7 @@ export default {
 				// }, new FormData());
 				// console.log(getFormData(this.formData));
 				this.$http({					// axios 통신 시작
-					url: "https://rest.finger.solutions/api/ReviewStt/",	// back 서버 주소
+					url: "https://exp.finger.solutions/sttapi/ReviewStt/",	// back 서버 주소
 					method: "POST",
 					data: this.formData,
 					headers: {

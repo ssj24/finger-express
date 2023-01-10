@@ -5,29 +5,25 @@
 			<v-col cols="12" class="mb-5 text-lg-center">
 				<h2>제품 특징</h2>
 			</v-col>
-			<v-col class="mx-auto" cols="12" md="6" v-for="(service, i) in services" :key="i">
+			<v-col class="mx-auto d-flex flex-wrap justify-center align-center" cols="12" md="6" v-for="(service, i) in services" :key="i">
 				<v-card
-					:class="{'ml-auto': i==0 || i==2}"
 					class="pa-0"
 					height="348px"
 					max-width="445px"
 					elevation="0"
-					:data-aos="i === 0 || i === 2 ? 'fade-right' : 'fade-left'"
-					data-aos-duration="2000"
-					data-aos-anchor-placement="top-bottom"
 				>
 					<v-img
 						:src=service.img
 						height="180px"
 						contain
 					></v-img>
-					<v-card-title style="margin-top: 5px; font-weight: 900;">
+					<v-card-title class="text-center text-md-left" style="margin-top: 5px; font-weight: 900;">
 						{{service.title}}
 					</v-card-title>
-					<v-card-subtitle class="pb-0" >
+					<v-card-subtitle class="pb-0 text-center text-md-left" >
 						{{service.desc}}
 					</v-card-subtitle>
-					<v-card-subtitle class="pt-0" >
+					<v-card-subtitle class="pt-0 text-center text-md-left" >
 						{{service.desc2}}
 					</v-card-subtitle>
 				</v-card>
