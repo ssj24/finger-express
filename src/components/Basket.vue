@@ -1,5 +1,5 @@
 <template>
-<div v-if="mode === 3" class="d-flex flex-column justify-center">
+<div class="d-flex flex-column justify-center">
 	<v-row class="form-header flex-column align-center justify-center">
 		<h1 class="mb-5">
 			장바구니
@@ -141,7 +141,6 @@ components: {
 },
 name: 'BasketComponent',
 props: {
-  mode: Number,
 },
 data: () => {
   let email = '';

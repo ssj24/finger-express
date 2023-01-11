@@ -1,13 +1,40 @@
 <template>
-  <v-row class="d-flex flex-column align-center justify-center">
-    <v-col cols="6">
+  <div class="accoutsContainer">
+    <div class="accountsWrapper">
+      <h1 v-if="isSignup">회원가입</h1>
+      <h1 v-else>로그인</h1>
+      <form v-if="isSignup">
+        <div class="aLine">
+          <input type="email" name="" id="">
+          <button>중복 확인</button>
+        </div>
+        <input type="password" name="" id="">
+        <input type="password" name="" id="">
+        <input type="text" name="" id="">
+        <input type="text" name="" id="">
+        <div class="aLine">
+          <input type="text" name="" id="">
+          <input type="text" name="" id="">
+          <button @click="execDaumPostcode">찾기</button>
+        </div>
+        <input type="text" name="" id="">
+      </form>
+      <form v-else>
+        <input type="email" name="" id="">
+        <input type="password" name="" id="">
+      </form>
+    </div>
+  </div>
+  <!-- <v-row class="py-5 d-flex flex-column align-center justify-center">
+    <v-col cols="11">
+      <h1 v-if="isSignup" class="text-center">회원가입</h1>
+      <h1 v-else class="text-center">로그인</h1>
       <v-form
         v-if="isSignup"
         ref="form"
         v-model="valid"
         lazy-validation
       >
-        <div @click="isSignup = false;">click it</div>
         <span class="d-flex">
           <v-text-field
             v-model="email"
@@ -90,7 +117,6 @@
         v-model="valid"
         lazy-validation
       >
-        <div @click="isSignup = true;">click it</div>
         <v-text-field
           v-model="email"
           :rules="emailRules"
@@ -106,8 +132,17 @@
           required
         ></v-text-field>
       </v-form>
+      <div class="d-flex justify-center">
+        <button @click="isSignup = true;" class="mr-2">
+          회원가입
+        </button>
+        |
+        <button disabled class="ml-2">
+          비밀번호 찾기
+        </button>
+      </div>
     </v-col>
-  </v-row>
+  </v-row> -->
 </template>
 
 <script>
@@ -243,6 +278,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+button {
+  color: black;
+}
+.row {
+  background-color: #F8FAFC;
+}
+.col {
+  background-color: #fff;
+}
 </style>

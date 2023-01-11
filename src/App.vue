@@ -34,17 +34,39 @@
       </v-btn>
 
       <v-spacer></v-spacer>
-
-      <v-btn class="white--text font-weight mr-2" outlined @click="toAdminComponent">관리자</v-btn>
-      <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(2)">신청하기</v-btn>
-      <!-- <v-btn class="white--text font-weight mr-2" outlined >장바구니</v-btn> -->
-      <v-btn class="white--text font-weight mr-2" outlined v-if="this.$store.state.isLogin">마이페이지</v-btn>
-      <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(3)">장바구니</v-btn>
-      <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn>
-      <v-btn class="white--text font-weight mr-2" outlined @click="logout" v-if="this.$store.state.isLogin">로그아웃</v-btn>
+      <span v-if="!this.$store.state.isLogin">
+        <v-btn class="white--text font-weight mr-2" outlined @click="signIn">로그인</v-btn>
+        <v-btn class="white--text font-weight mr-2" outlined @click="signUp">회원가입</v-btn>
+      </span>
+      <span v-else-if="false">
+        <router-link to="/admin">
+          <v-btn class="white--text font-weight mr-2" outlined
+            @click="toAdminComponent"
+            v-if="false"
+          >고객 주문 현황</v-btn>
+        </router-link>
+      </span>
+      <span v-else>
+        <router-link to="/application">
+          <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(2)">신청하기</v-btn>
+        </router-link>
+        <!-- <router-link to="/:client_ID">
+          <v-btn class="white--text font-weight mr-2" outlined >마이페이지</v-btn>
+        </router-link> -->
+        <router-link to="/cart">
+          <v-btn class="white--text font-weight mr-2" outlined @click="modeChanged(3)">장바구니</v-btn>
+        </router-link>
+        <v-btn class="white--text font-weight mr-2" outlined @click="logout">로그아웃</v-btn>
+      </span>
+      
     </v-app-bar>
+    <!-- component matched by the route will render here -->
+    <v-main class="d-flex justify-center align-center">
 
-    <v-main class="d-flex justify-center align-center" v-if="toAdmin">
+      <router-view></router-view>
+    </v-main>
+    
+    <!-- <v-main class="d-flex justify-center align-center" v-if="toAdmin">
       <Admin :toAdmin="toAdmin" />
     </v-main>
     <v-main class="d-flex justify-center align-center" v-else-if="!toSignIn">
@@ -52,6 +74,8 @@
         v-if="mode === 1"
         :mode="mode"
         @clicked="modeChanged"
+        @signIn="signIn"
+        @signUp="signUp"
       />
       <Application
         v-if="mode === 2"
@@ -71,30 +95,30 @@
     </v-main>
     <v-main class="d-flex justify-center align-center" v-else-if="toSignIn">
       <Sign-up />
-    </v-main>
+    </v-main> -->
     <Footer />
   </v-app>
 </template>
 
 <script>
-import Admin from './components/Admin.vue';
-import Home from './components/Home.vue';
-import Application from './components/Application.vue';
-import Basket from './components/Basket.vue';
-import OrderSuccess from './components/OrderSuccess.vue';
-import SignUp from './components/Signup.vue';
+// import Admin from './components/Admin.vue';
+// import Home from './components/Home.vue';
+// import Application from './components/Application.vue';
+// import Basket from './components/Basket.vue';
+// import OrderSuccess from './components/OrderSuccess.vue';
+// import SignUp from './components/Signup.vue';
 import Footer from './components/Footer.vue';
 
 export default {
   name: 'App',
 
   components: {
-    Admin,
-    Home,
-    Application,
-    Basket,
-    OrderSuccess,
-    SignUp,
+    // Admin,
+    // Home,
+    // Application,
+    // Basket,
+    // OrderSuccess,
+    // SignUp,
     Footer,
   },
   data: () => ({
@@ -118,7 +142,7 @@ export default {
 
     },
     reloadPage() {
-      window.location.reload();
+      window.location.href = '/';
     },
     modeChanged(val) {
       this.mode = val;
@@ -135,23 +159,33 @@ export default {
       this.toAdmin = true;
 
     },
+    signUp() {
+      // this.toSignIn = true;
+      window.location.href = '/accounts/signup';
+    },
     signIn() {
-      this.toSignIn = true;
+      window.location.href = '/accounts/login';
+      // this.$store.commit('LOGGED_IN');
+      // this.toSignIn = true;
     },
     logout() {
-      window.location.reload();
-      this.$store.commit('LOGGED_OUT');
-    }
+      window.location.href = '/accounts/logout';
+
+      // window.location.reload();
+      // this.$store.commit('LOGGED_OUT');
+    },
+    
   }
 };
 </script>
 
 <style lang="scss">
+
 .v-toolbar__content {
   // border-bottom: 1px solid #E7E7E7;
 }
 .appContainer {
-  font-family: 'S-CoreDream-3Light',  sans-serif;
+  font-family: 'Pretendard-Regular',  sans-serif;
 }
 #no-background-hover::before {
    background-color: transparent !important;
@@ -164,4 +198,7 @@ main {
 // .theme--light.v-app-bar.v-toolbar.v-sheet.backDark {
 //   background-color: #152035;
 // }
+a {
+  text-decoration: none;
+}
 </style>

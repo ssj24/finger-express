@@ -84,19 +84,17 @@
 										<!-- :disabled="files.length ? true : false" -->
 										미리보기
 									</v-btn>
-									<!-- <v-btn
+									<v-btn
 										width="50%"
 										color="accent"
 										outlined
 										@click="tempPreview"
 									>
 										TEMP
-									</v-btn> -->
+									</v-btn>
 								</v-col>
 							</v-row>
-							<Loading v-if="isLoading"/>
-
-							<v-row v-else>
+							<v-row>
 								<v-col cols="12"
 									@dragover.prevent
 									@drop.prevent
@@ -138,13 +136,12 @@
 			<v-row class="flex-grow-1">
 				<v-col cols="12">
 					<Loading v-if="isComplete"/>
-					<Sentences v-else :previewText="previewText[currentFile]" :fileName="currentFile" :showPreview="preview" @validateClicked="validate"/>
+					<Sentences v-else :previewText="previewText" :showPreview="preview" @validateClicked="validate"/>
 
 				</v-col>
 			</v-row>
 		</v-col>
 	</v-row>
-	
 </div>
 <Payment v-else-if="mode === 3" :formData="formData" :files="files" class="d-flex align-center justify-center my-12" />
 </template>
@@ -162,13 +159,13 @@ export default {
 			Sentences,
     },
 		props: {
-			mode: Number,
 		},
     data: () => {
 			let previewText = {};
 			let clientMail = 'client@test.com';
 			let currentFile = '';
 			return {
+				mode: 2,
 				clientMail,
 				delivery: 'email',
 				authentication: false,
@@ -234,18 +231,30 @@ export default {
       reset () {
         this.$refs.form.reset();
       },
-			showFile(files) {
-				window.URL = window.URL || window.webkitURL;
-				let video = document.createElement('video');
-				for (const f of files) {
-					video.addEventListener('loadedmetadata', () => {
-						window.URL.revokeObjectURL(video.src);
-						f.duration = video.duration;
-					});
-					video.preload = 'metadata';
-					video.src = URL.createObjectURL(f);
-					f.sizeInMB = (f.size / (1024*1024)).toFixed(2);
-					this.files.push(f);
+			showFile(newFiles) {
+				// if (this.files.length) {
+				// 	newFiles = newFiles.filter(x => {
+				// 		this.files.every(({name}) => {
+				// 			console.log(name, x.name)
+				// 			x.name !== name
+				// 			} )
+				// 	});
+				// 	console.log(newFiles)
+				// }
+				if (newFiles.length) {
+					window.URL = window.URL || window.webkitURL;
+					let video = document.createElement('video');
+					for (const f of newFiles) {
+						video.addEventListener('loadedmetadata', () => {
+							window.URL.revokeObjectURL(video.src);
+							f.duration = video.duration;
+						});
+						video.preload = 'metadata';
+						video.src = URL.createObjectURL(f);
+						f.sizeInMB = (f.size / (1024*1024)).toFixed(2);
+						this.files.push(f);
+					}
+					this.showPreview();
 				}
 			},
 			uploadHandler() {
@@ -268,9 +277,6 @@ export default {
 				}
 			},
 			dragFile(e) {
-				// for (const f of e.dataTransfer.files) {
-				// 	this.files.push(f);
-				// }
 				this.showFile(e.dataTransfer.files);
       },
 			deleteF(index, e) {
@@ -287,7 +293,7 @@ export default {
 				);
 			},
 			showPreview() {
-				this.isLoading = true;
+				this.isComplete = true;
 
 				if (this.files.length) {
 				const timeFormat = this.getTimeFormat();
@@ -316,6 +322,7 @@ export default {
 						'Content-Type': 'multipart/form-data'
 					}
 				}).then(res => {				// back 서버로부터 응답받으면
+				console.log(res)
 						if (res.statusText === 'OK') { //client_id와 비교 필요
 							for (const filedata of res.data) {
 								this.previewText[filedata.file_name] = filedata.sentence;
@@ -329,7 +336,7 @@ export default {
 							this.currentFile = previewKeys[previewKeys.length -1];
 							console.log('current', this.previewText[this.currentFile]);
 							this.preview = true;
-							this.isLoading = false;
+							this.isComplete = false;
 
 						}
 				}).catch(err => console.log(err));
@@ -822,11 +829,15 @@ export default {
 							}
 					]
 			};
+
+
 				// this.previewText['temp_file_name']=previewList;
-				this.currentFile = 'temp_file_name';
-				for (let t of this.previewText['temp_file_name']) {
-					t.minStart = this.msToMin(t.start);
-					t.minEnd = this.msToMin(t.end);
+				for (let fileData of Object.keys(this.previewText)) {
+						for (let i of fileData) {
+							i.minStart = this.msToMin(i.start);
+							i.minEnd = this.msToMin(i.end);
+						}
+						this.currentFile = fileData;
 				}
 				console.log(this.previewText);
 				this.preview = true;

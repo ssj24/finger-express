@@ -14,11 +14,13 @@
             <p>원하는 구간을 선택해주세요.</p>
           </v-col>
           <p class="mr-5">
-            총 길이: {{this.previewText[this.previewText.length-1].minEnd}} |
+            총 길이: {{'this.previewText[this.previewText.length-1].minEnd'}} |
             선택 길이: {{this.selected.length}}
           </p>
         </v-row>
-        <div class="text--primary previewCheckboxes" :id="'previewCheckboxes-'+i" v-for="(text, i) in previewText" :key="i">
+        <p v-for="(pre, i) in Object.keys(previewText)" :key="i" >{{pre}}</p>
+
+        <div class="text--primary previewCheckboxes" :id="'previewCheckboxes-'+i" v-for="(text, i) in previewText[pre]" :key="i">
           <div @click="onLabelClicked(i, $event)" class="previewLabel">
             <div class="px-5 previewLabelCard my-5">
               <v-card-subtitle>
@@ -126,7 +128,6 @@
 export default {
   name: 'sentencesComponent',
   props: {
-    fileName: String,
     previewText: [],
     showPreview: Boolean,
   },

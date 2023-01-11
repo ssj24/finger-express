@@ -3,7 +3,7 @@
     <v-row class="mb-4 main-row white--text">
       <v-col cols="12" class="text-center">
         <h2 class="subheading font-weight-regular mb-5 px-5">
-          <div class="mr-2">
+          <div class="mr-2"  @click="tempLogin">
             원하는 구간만 무료로
           </div>
           <br class="d-none">
@@ -27,9 +27,15 @@
           class="mb-5 d-flex justify-center"
           cols="12"
         >
-          <button class="toApplicationBtn" @click="clicked">
-            신청하기
-          </button>
+          <span v-if="!this.$store.state.isLogin">
+            <button class="toApplicationBtn" @click="signIn">로그인</button>
+            <!-- <v-btn class="white--text font-weight mr-2" outlined @click="signUp">회원가입</v-btn> -->
+          </span>
+          <span v-else>
+            <button class="toApplicationBtn" @click="clicked">
+              신청하기
+            </button>
+          </span>
         </v-col>
       </v-row>
       </v-col>
@@ -169,6 +175,19 @@ export default {
     clicked() {
       this.$emit('clicked', 2);
     },
+    signIn() {
+      this.$emit('signIn');
+    },
+    signUp() {
+      this.$emit('signUp');
+    },
+    tempLogin() {
+      if (this.$store.state.isLogin) {
+        this.$store.commit('LOGGED_OUT');
+      } else {
+        this.$store.commit('LOGGED_IN');
+      }
+    }
   }
 }
 </script>

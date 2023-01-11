@@ -17,7 +17,7 @@
 						height="180px"
 						contain
 					></v-img>
-					<v-card-title class="text-center text-md-left" style="margin-top: 5px; font-weight: 900;">
+					<v-card-title class="justify-center" style="margin-top: 5px; font-weight: 900;">
 						{{service.title}}
 					</v-card-title>
 					<v-card-subtitle class="pb-0 text-center text-md-left" >
